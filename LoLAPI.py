@@ -7,6 +7,8 @@ from pathlib import Path
 
 res = assets() + 'League of Legends/Data'
 
+Path(res).mkdir(parents=True, exist_ok=True)
+
 with open(assets() + 'settings/Tokens.json', 'r') as fp:
     tokens = json.load(fp)
 API_Key = tokens['LoL']
@@ -147,8 +149,13 @@ class LoLData:
         return 200, match_list
 
 
+
+"""
 ldt = LoLData()
-ldt.get_match_history('Laggrif', games_count=1)
+with open(res + "/his_ex.json", 'w') as f:
+    json.dump(ldt.get_match_history(ldt.get_player_uuid('Laggrif'), games_count=1)[1], f, sort_keys=True, indent=2)
+
+"""
 
 """
 Orianna = get_champ_infos('Orianna')

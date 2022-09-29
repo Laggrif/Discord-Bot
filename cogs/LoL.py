@@ -18,9 +18,10 @@ async def advanced_stats(interaction: Interaction, match, summoner_stats):
     embed = Embed(title='Advanced Stats', description='une description')
     embed.add_field(name='Score', value='0/100/0')
 
+    win = match
+
     im = Image.open(res + 'base.png')
     image = ImageDraw.Draw(im)
-    image.text()
     await interaction.message.edit(content=None, embed=embed, view=None)
 
 
@@ -64,10 +65,6 @@ class LoL(commands.Cog):
                 return
             history = history[1]
             for match in history:
-                win = match['info']['participants'][0]['win']
-                embed = Embed(title='Victory' if win else 'Defeat',
-                              color=discord.Color.green() if win else discord.Color.red())
-
                 # Gets the position of summoner in match
                 player_order = 0
                 for player in match['metadata']['participants']:
@@ -77,6 +74,10 @@ class LoL(commands.Cog):
                         player_order += 1
 
                 summoner_stats = match['info']['participants'][player_order]
+
+                win = summoner_stats['win']
+                embed = Embed(title='Victory' if win else 'Defeat',
+                              color=discord.Color.green() if win else discord.Color.red())
 
                 # For kayn, gets the transformation
                 transform = summoner_stats['championTransform']

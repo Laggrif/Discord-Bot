@@ -2,3 +2,5 @@
 /res/settings/
 /res/suggestions/
 /res/downloads/
+/venv/
+/Tests.py

@@ -1,7 +1,7 @@
 import time
 
-import Adafruit_GPIO.SPI as SPI
-import Adafruit_SSD1306
+import adafruit_ssd1306
+import board
 
 from PIL import Image
 from PIL import ImageDraw
@@ -12,14 +12,11 @@ from Assets import assets
 
 res = assets()
 
-
-disp = Adafruit_SSD1306.SSD1306_128_64(rst=None)
-
-disp.begin()
+disp = adafruit_ssd1306.SSD1306_I2C(width=128, height=64, i2c=board.I2C())
 
 # Clear display.
-disp.clear()
-disp.display()
+disp.fill(0)
+disp.show()
 
 # Create blank image for drawing.
 # Make sure to create image with mode '1' for 1-bit color.
@@ -78,7 +75,7 @@ def clock(display, cnt):
                   font=font_d, fill=1, align='center')
 
     display.image(image)
-    display.display()
+    display.show()
 
 
 async def main():

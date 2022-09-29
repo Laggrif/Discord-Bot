@@ -1,5 +1,4 @@
 import json
-import sys
 import tracemalloc
 
 from discord.ext import commands
@@ -17,6 +16,7 @@ res = assets()
 # Search the token for the right bot to launch
 with open(res + 'settings/Tokens.json', 'r') as fp:
     bots = json.load(fp)["Bot"]
+    # Change "Esclave" for the name of your default bot
     token = bots["Esclave"][0]
     welcome_channel = bots['Esclave'][1]
     if len(sys.argv) == 2:

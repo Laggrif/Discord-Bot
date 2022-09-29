@@ -23,7 +23,22 @@ with open(Assets.assets() + 'settings/Active_Chatbot_Channels.json', 'r') as fp:
     print(stri.startswith(pref))
     print(stri[len(pref):])
 """
+
+"""
+ldt = LoLAPI.LoLData()
+i = ldt.get_match_history('La Loutre Verte', games_count=1)
+
 with open('./res/League of Legends/f.json', 'w') as fb:
-    ldt = LoLAPI.LoLData()
-    i = ldt.get_match_history('La Loutre Verte', games_count=1)
     json.dump(i[0], fb, indent=4, separators=(',', ': '))
+"""
+
+"""
+def game_duration_string(n):
+    time = n
+    minutes = int(time / 60)
+    seconds = time - minutes * 60
+    return '{}:{:02d}'.format(minutes, seconds)
+
+
+print(game_duration_string(1462))
+"""
