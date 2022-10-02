@@ -22,6 +22,7 @@ class LoLData:
         self.ddragon_versions = requests.get("https://ddragon.leagueoflegends.com/api/versions.json" + url_token)
         self.ddragon_versions_json = self.ddragon_versions.json()
         self.current_ddragon_version = self.ddragon_versions_json[0]
+        self.queues = self.get_queues()
         self.champ_list = self.get_champ_list()
 
     def check_version_language(self, version, language):
@@ -45,7 +46,15 @@ class LoLData:
         if self.current_ddragon_version != self.ddragon_versions_json[0]:
             self.current_ddragon_version = self.ddragon_versions_json[0]
             self.champ_list = self.get_champ_list()
+            self.queues = self.get_queues()
             self.get_all_champs_infos()
+
+    def get_queues(self):
+        queues = requests.get('https://static.developer.riotgames.com/docs/lol/queues.json')
+        with open(res + '/queues.json', 'w') as fp:
+            json.dump(queues.json(), fp, indent=4, separators=(',', ': '))
+
+        return queues.json()
 
     def get_champ_list(self, version=None, language=None):
         version, language = self.check_version_language(version, language)
@@ -82,11 +91,11 @@ class LoLData:
 
         version, language = self.check_version_language(version, None)
 
-        if not os.path.isfile(res + '/Champions_icons/{}/{}.png'.format(version, champion)):
+        if not os.path.isfile(assets() + 'images/lol/Champions_icons/{}/{}.png'.format(version, champion)):
             image = requests.get(
                 'https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png'.format(version, champion)).content
-            Path(res + '/Champions_icons/{}'.format(version)).mkdir(parents=True, exist_ok=True)
-            with open(res + '/Champions_icons/{}/{}.png'.format(version, champion), 'wb') as fb:
+            Path(assets() + 'images/lol/Champions_icons/{}'.format(version)).mkdir(parents=True, exist_ok=True)
+            with open(assets() + 'images/lol/Champions_icons/{}/{}.png'.format(version, champion), 'wb') as fb:
                 fb.write(image)
 
     def get_all_champs_infos(self, version=None, language=None):
@@ -127,15 +136,12 @@ class LoLData:
             return 400
         return summoner.json()['puuid']
 
-    def get_match_history(self, summoner_uuid, games_count=None, type=None):
+    def get_match_history(self, summoner_uuid, games_count=None):
         if games_count is None:
             games_count = 5
 
-        if type is None:
-            type = 'normal'
-
         history = requests.get(
-            "https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{}/ids?type={}&start=0&count={}&api_key={}"
+            "https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{}/ids?start=0&count={}&api_key={}"
             .format(summoner_uuid, type, games_count, API_Key))
 
         if history.status_code != 200:

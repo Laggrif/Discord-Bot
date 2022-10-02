@@ -77,6 +77,7 @@ class Display(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         self.disp, msg = init_display()
+        print(msg)
         if self.disp is not None:
             await display_logo(self.disp)
             # await asyncio.sleep(10)
