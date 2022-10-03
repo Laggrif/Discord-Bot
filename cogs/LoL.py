@@ -20,17 +20,18 @@ res = assets() + 'League of Legends/'
 
 class LimitedList:
     def __init__(self, max_length: int):
-        self.list = []
+        self.list = {}
         self.maxLength = max_length
 
-    def add(self, ele):
-        self.list.append(ele)
+    def add(self, ele, key):
+        self.list[key] = ele
         if len(self.list) > self.maxLength:
-            self.list.pop(0)
+            (k := next(iter(self.list)), self.list.pop(k))
+
         return len(self.list) - 1
 
-    def get(self, index):
-        return self.list[index]
+    def get(self, key):
+        return self.list.get(key)
 
 
 matchs = LimitedList(500)
@@ -82,8 +83,6 @@ class LoL(commands.Cog):
             for data in history:
                 match = Match(data, summoner_uuid, self.LoLData.queues)
 
-                index = matchs.add(match)
-
                 win = match.win()
                 embed = Embed(title='Victory' if win else 'Defeat',
                               color=discord.Color.green() if win else discord.Color.red())
@@ -113,8 +112,9 @@ class LoL(commands.Cog):
                 embed.set_thumbnail(url='attachment://champ_icon.png')
 
                 # Adds a button to show advanced stats
-                async def advanced_stats_callback(interaction: Interaction, index):
-                    image = AdvancedHistory.AMH_picture(matchs.get(index), self.LoLData)
+                async def advanced_stats_callback(interaction: Interaction):
+                    if
+                    image = AdvancedHistory.AMH_picture(matchs.get(interaction.message.id), self.LoLData)
                     with io.BytesIO() as bites:
                         image.save(bites, format='PNG')
                         bites.seek(0)
@@ -127,7 +127,9 @@ class LoL(commands.Cog):
                 view = View(button, timeout=None)
 
                 # Send embed
-                await ctx.send(embed=embed, file=champ_icon, view=view)
+                msg = await ctx.send(embed=embed, file=champ_icon, view=view)
+
+                matchs.add(match, msg.id)
 
     @commands.command(help='Lie votre nom d\'invocateur LoL. Permet de rechercher votre historique de parties sans '
                            'spécifier d\'invocateur', aliases=['link'])

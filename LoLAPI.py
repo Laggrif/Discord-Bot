@@ -141,8 +141,7 @@ class LoLData:
             games_count = 5
 
         history = requests.get(
-            "https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{}/ids?start=0&count={}&api_key={}"
-            .format(summoner_uuid, type, games_count, API_Key))
+            f"https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/{summoner_uuid}/ids?start=0&count={games_count}&api_key={API_Key}")
 
         if history.status_code != 200:
             return history.status_code, None

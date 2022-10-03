@@ -58,7 +58,8 @@ def AMH_picture(match: Match, lolData: LoLData):
         x = WIDTH - MARGIN - ICON_SIZE
         y = MARGIN
         draw.rectangle((x - 1, y - 1, x + ICON_SIZE, y + ICON_SIZE))
-        with Image.open(res + f'images/lol/Champions_icons/{lolData.current_ddragon_version}/{match.champion()}.png', 'r') as icon:
+        with Image.open(res + f'images/lol/Champions_icons/{lolData.current_ddragon_version}/{match.champion()}.png',
+                        'r') as icon:
             icon = icon.resize((240, 240))
             img.paste(icon, (x, y))
         champ_icon_box = (x, y, x + ICON_SIZE, y + ICON_SIZE)
@@ -86,12 +87,33 @@ def AMH_picture(match: Match, lolData: LoLData):
         x_ally = WIDTH / 2 - draw.textlength(ally, font) - 30
         x_enemy = WIDTH / 2 + 30
         y = game_mode_box[1]
-        draw.text((x_ally, y), ally, fill=(255, 5, 5, 255), font=font)
-        draw.text((x_enemy, y), enemy, fill=(160, 5, 255, 255), font=font)
+        draw.text((x_ally, y), ally, fill=(160, 5, 255, 255), font=font)
+        draw.text((x_enemy, y), enemy, fill=(255, 5, 5, 255), font=font)
         ally_box = draw.textbbox((x_ally, y), ally, font)
         enemy_box = draw.textbbox((x_enemy, y), enemy, font)
         teams_score_box = [ally_box[0], min(ally_box[1], enemy_box[1]), enemy_box[2], max(ally_box[3], enemy_box[3])]
 
         # towers destroyed
 
+
+"""
+        # towers destroyed
+        font = ImageFont.truetype(FONT, 40)
+        tower_num_ally = int(match.team_turret_kills())
+        ally_tower_path = res + 'images/lol/icon-tower.png'
+        tower_num_enemy = int(match.enemy_turret_kills())
+        enemy_tower_path = res + 'images/lol/icon-tower-r.png'
+        show_icon_objectives(ally_tower_path, tower_num_ally, teams_score_box, (-1, -1), img)
+        show_icon_objectives(enemy_tower_path, tower_num_enemy, teams_score_box, (1, -1), img)
         return img
+"""
+
+"""
+def show_icon_objectives(path, num, box, pos, img):
+    for i in range(num):
+        anchor_x = box[0 if pos[0] == -1 else 2]
+        coord = (int(anchor_x + pos[0] * 45 * (i + 1)), int((box[1] + box[3]) / 2 + pos[1] * 45))
+        with Image.open(path, 'r') as icon:
+            icon = icon.resize((40, 40))
+            img.paste(icon, coord, mask=icon)
+"""

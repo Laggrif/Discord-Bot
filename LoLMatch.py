@@ -90,6 +90,12 @@ class Match:
     def first_blood_team(self):
         return self.teams_infos[self.team][OBJECTIVES]['champion']['first']
 
+    def team_turret_kills(self):
+        return self.teams_infos[self.team][OBJECTIVES]['tower']['kills']
+
+    def enemy_turret_kills(self):
+        return self.teams_infos[1 - self.team][OBJECTIVES]['tower']['kills']
+
     # ------------------- player stats ---------------------
 
     def kills(self):
