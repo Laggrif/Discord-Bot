@@ -1,3 +1,5 @@
+from datetime import datetime
+
 PARTICIPANTS = 'participants'
 CHALLENGES = 'challenges'
 TEAMS = 'teams'
@@ -6,8 +8,9 @@ OBJECTIVES = 'objectives'
 
 class Match:
 
-    def __init__(self, match, uuid: str):
-        self.match = match[1]
+    def __init__(self, match, uuid: str, queues):
+        self.match = match
+        self.queues = queues
         self.infos = self.match['info']
         self.summoner = 0
         for player in self.match['metadata'][PARTICIPANTS]:
@@ -19,16 +22,31 @@ class Match:
         self.team = 0 if self.player_infos['teamId'] == self.infos['teams'][0]['teamId'] else 1
         self.teams_infos = self.infos['teams']
 
+        for queue in self.queues:
+            if queue['queueId'] == self.infos['queueId']:
+                self.queue = queue
+                break
+
     # ------------------- game stats ---------------------
 
     def game_duration_string(self):
         time = self.infos['gameDuration']
-        minutes = time / 60
+        minutes = int(time / 60)
         seconds = time - minutes * 60
         return '{}:{:02d}'.format(minutes, seconds)
 
     def game_duration_seconds(self):
         return self.infos['gameDuration']
+
+    def date(self):
+        unix_time = self.infos['gameStartTimestamp'] / 1000
+        return datetime.fromtimestamp(unix_time).strftime('%d %b %Y %H:%M')
+
+    def game_mode(self):
+        return self.queue['description']
+
+    def map(self):
+        return self.queue['map']
 
     # -------------------- teams stats -------------------
 
@@ -41,13 +59,32 @@ class Match:
     def team_deaths(self):
         deaths = 0
         for player in self.infos[PARTICIPANTS]:
-            deaths += player['kills']
+            if player['teamId'] == self.teams_infos[self.team]['teamId']:
+                deaths += player['deaths']
         return deaths
 
     def team_assists(self):
         assists = 0
         for player in self.infos[PARTICIPANTS]:
-            assists += player['assists']
+            if player['teamId'] == self.teams_infos[self.team]['teamId']:
+                assists += player['assists']
+        return assists
+
+    def enemy_kills(self):
+        return self.teams_infos[1 - self.team][OBJECTIVES]['champion']['kills']
+
+    def enemy_deaths(self):
+        deaths = 0
+        for player in self.infos[PARTICIPANTS]:
+            if player['teamId'] == self.teams_infos[1 - self.team]['teamId']:
+                deaths += player['deaths']
+        return deaths
+
+    def enemy_assists(self):
+        assists = 0
+        for player in self.infos[PARTICIPANTS]:
+            if player['teamId'] == self.teams_infos[1 - self.team]['teamId']:
+                assists += player['assists']
         return assists
 
     def first_blood_team(self):
@@ -114,7 +151,13 @@ class Match:
         return self.player_infos['championName']
 
     def transform(self):
-        return self.player_infos['championTransform']
+        transform = self.player_infos['championTransform']
+        if transform == 0:
+            return ''
+        elif transform == 1:
+            return ' Darkin'
+        elif transform == 2:
+            return ' Assassin'
 
     def gold_earned(self):
         return self.player_infos['goldEarned']
@@ -127,9 +170,3 @@ class Match:
         minutes = time / 60
         seconds = time - minutes * 60
         return '{}:{:02d}'.format(minutes, seconds)
-
-
-
-
-
-
