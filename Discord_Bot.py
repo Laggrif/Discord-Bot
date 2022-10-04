@@ -1,17 +1,18 @@
 import json
 import tracemalloc
 
+from discord import Option
 from discord.ext import commands
+from discord import option
 
 from Assets import assets
 from MyError import NoError
+from cogs.Display import Display
 from cogs.Voice import *
 from cogs.Checks import *
 
-
 # folder to search for res
 res = assets()
-
 
 # Search the token for the right bot to launch
 with open(res + 'settings/Tokens.json', 'r') as fp:
@@ -25,11 +26,9 @@ with open(res + 'settings/Tokens.json', 'r') as fp:
             token = bots[arg][0]
             welcome_channel = bots[arg][1]
 
-
 # initialise bot
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix="", intents=intents)
-
+bot = commands.Bot(command_prefix="", intents=intents, debug_guilds=[944230321572962314])
 
 tracemalloc.start()
 
@@ -63,33 +62,42 @@ async def on_voice_state_updated(ctx, before, after):
     pass
 
 
-@bot.command()
+@bot.slash_command(name='reload', description='Reloads specified cog or all cogs if none are specified')
+@option('cog',
+        description="Enter a cog name",
+        required=False,
+        default=None,
+        autocomplete=lambda ctx : list(bot.cogs.keys())
+        )
 @Checks.is_owner()
-async def reload(ctx, extension):
-    if f'{extension}' == 'help':
-        bot.unload_extension('MyHelp')
-        bot.load_extension('MyHelp')
-    elif extension in bot.cogs:
-        bot.reload_extension(f'cogs.{extension}')
-        await ctx.send(f'Reloaded Cog {extension}')
-    else:
-        await ctx.send('Assure cog is valid')
-
-
-@reload.error
-async def reload_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument)\
-            or isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
+async def reload(ctx: discord.ApplicationContext, cog: str):
+    if cog is None:
         bot.unload_extension('cogs.MyHelp')
         bot.load_extension('cogs.MyHelp')
-        # Display.show_stats.stop()
-        # Display.show_clock.stop()
+        Display.show_stats.stop()
+        Display.show_clock.stop()
         tmp = bot.cogs.copy()
         tmp.pop('Help')
         for ext in tmp.keys():
             bot.unload_extension(f'cogs.{ext}')
             bot.load_extension(f'cogs.{ext}')
-        await ctx.send('Reloaded all cogs')
+        await ctx.respond('Reloaded all cogs')
+        return
+
+    if f'{cog}' == 'help':
+        bot.unload_extension('MyHelp')
+        bot.load_extension('MyHelp')
+    elif cog in bot.cogs:
+        bot.reload_extension(f'cogs.{cog}')
+        await ctx.respond(f'Reloaded Cog {cog}')
+    else:
+        await ctx.respond('Assure cog is valid')
+
+
+@reload.error
+async def reload_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument) \
+            or isinstance(error, discord.ext.commands.errors.MissingRequiredArgument):
         pass
     elif isinstance(error, commands.CheckFailure):
         return
@@ -136,6 +144,5 @@ bot.load_extension('cogs.Checks')
 bot.load_extension('cogs.GUI')
 bot.load_extension('cogs.ChatBot')
 bot.load_extension('cogs.LoL')
-
 
 bot.run(token)

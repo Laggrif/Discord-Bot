@@ -96,6 +96,12 @@ class Match:
     def enemy_turret_kills(self):
         return self.teams_infos[1 - self.team][OBJECTIVES]['tower']['kills']
 
+    def team_baron_kills(self):
+        return self.teams_infos[self.team][OBJECTIVES]['baron']['kills']
+
+    def enemy_baron_kills(self):
+        return self.teams_infos[1 - self.team][OBJECTIVES]['baron']['kills']
+
     # ------------------- player stats ---------------------
 
     def kills(self):

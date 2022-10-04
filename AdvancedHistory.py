@@ -4,18 +4,19 @@ import Assets
 from LoLAPI import LoLData
 from LoLMatch import Match
 
+res = Assets.assets()
+
+FONT = res + 'fonts/Friz Quadrata Std Medium.otf'
+
+WIDTH = 1920
+HEIGHT = 1080
+
+ICON_SIZE = 240
+
+MARGIN = 5
+
 
 def AMH_picture(match: Match, lolData: LoLData):
-    res = Assets.assets()
-
-    FONT = res + 'fonts/Friz Quadrata Std Medium.otf'
-
-    WIDTH = 1920
-    HEIGHT = 1080
-
-    ICON_SIZE = 240
-
-    MARGIN = 5
 
     with Image.open(res + 'images/lol/base.png') as img:
         draw = ImageDraw.Draw(img, 'RGBA')
@@ -23,9 +24,10 @@ def AMH_picture(match: Match, lolData: LoLData):
         # win
         font = ImageFont.truetype(FONT, 50)
         win = 'Victory' if match.win() else 'Defeat'
+        color = (10, 210, 5, 255) if match.win() else (255, 70, 0, 220)
         x = MARGIN
         y = MARGIN
-        draw.text((x, y), win, fill=(10, 210, 5, 255),
+        draw.text((x, y), win, fill=color,
                   font=font)
         win_box = draw.textbbox((x, y), win, font)
 
@@ -58,10 +60,8 @@ def AMH_picture(match: Match, lolData: LoLData):
         x = WIDTH - MARGIN - ICON_SIZE
         y = MARGIN
         draw.rectangle((x - 1, y - 1, x + ICON_SIZE, y + ICON_SIZE))
-        with Image.open(res + f'images/lol/Champions_icons/{lolData.current_ddragon_version}/{match.champion()}.png',
-                        'r') as icon:
-            icon = icon.resize((240, 240))
-            img.paste(icon, (x, y))
+        paste_image(res + f'images/lol/Champions_icons/{lolData.current_ddragon_version}/{match.champion()}.png',
+                    (x, y), (240, 240), img, mask=False)
         champ_icon_box = (x, y, x + ICON_SIZE, y + ICON_SIZE)
 
         # champion
@@ -93,7 +93,68 @@ def AMH_picture(match: Match, lolData: LoLData):
         enemy_box = draw.textbbox((x_enemy, y), enemy, font)
         teams_score_box = [ally_box[0], min(ally_box[1], enemy_box[1]), enemy_box[2], max(ally_box[3], enemy_box[3])]
 
-        # towers destroyed
+        # size of box containing scores and objectives
+        teams_box = [0, 0, 0, 0]
+
+        # ally towers destroyed
+        size = 40
+        font = ImageFont.truetype(FONT, 40)
+        tower_num_ally = str(match.team_turret_kills())
+        size_text_ally = draw.textbbox((0, 0), tower_num_ally, font=font)
+        x_icon_ally = int(teams_score_box[0] - 2 * size)
+        y_icon_ally = int((teams_score_box[1] + teams_score_box[3]) / 2 - size - MARGIN)
+        x_text_ally = x_icon_ally - size_text_ally[2] - 10
+        y_text_ally = y_icon_ally + (size - size_text_ally[3]) / 2
+        paste_image(res + 'images/lol/icon-tower.png', (x_icon_ally, y_icon_ally), (size, size), img)
+        draw.text((x_text_ally, y_text_ally), tower_num_ally, fill=(160, 5, 255, 255), font=font)
+        teams_box[0] = x_text_ally
+        teams_box[1] = y_icon_ally
+
+        # ally barons killed
+        size = 40
+        font = ImageFont.truetype(FONT, 40)
+        tower_num_ally = str(match.team_baron_kills())
+        size_text_ally = draw.textbbox((0, 0), tower_num_ally, font=font)
+        x_icon_ally = int(teams_score_box[0] - 2 * size)
+        y_icon_ally = int((teams_score_box[1] + teams_score_box[3]) / 2 + MARGIN)
+        x_text_ally = x_icon_ally - size_text_ally[2] - 10
+        y_text_ally = y_icon_ally + (size - size_text_ally[3]) / 2
+        paste_image(res + 'images/lol/icon-baron.png', (x_icon_ally, y_icon_ally), (size, size), img)
+        draw.text((x_text_ally, y_text_ally), tower_num_ally, fill=(160, 5, 255, 255), font=font)
+
+        # enemy towers destroyed
+        size = 40
+        font = ImageFont.truetype(FONT, 40)
+        tower_num_enemy = str(match.enemy_turret_kills())
+        size_text_enemy = draw.textbbox((0, 0), tower_num_enemy, font=font)
+        x_icon_enemy = int(teams_score_box[2] + size)
+        y_icon_enemy = int((teams_score_box[1] + teams_score_box[3]) / 2 - size - MARGIN)
+        x_text_enemy = x_icon_enemy + size + 10
+        y_text_enemy = y_icon_enemy + (size - size_text_enemy[3]) / 2
+        paste_image(res + 'images/lol/icon-tower-r.png', (x_icon_enemy, y_icon_enemy), (size, size), img)
+        draw.text((x_text_enemy, y_text_enemy), tower_num_enemy, fill=(255, 5, 5, 255), font=font)
+
+        # enemy barons killed
+        size = 40
+        font = ImageFont.truetype(FONT, 40)
+        tower_num_enemy = str(match.enemy_baron_kills())
+        size_text_enemy = draw.textbbox((0, 0), tower_num_enemy, font=font)
+        x_icon_enemy = int(teams_score_box[2] + size)
+        y_icon_enemy = int((teams_score_box[1] + teams_score_box[3]) / 2 + MARGIN)
+        x_text_enemy = x_icon_enemy + size + 10
+        y_text_enemy = y_icon_enemy + (size - size_text_enemy[3]) / 2
+        paste_image(res + 'images/lol/icon-baron-r.png', (x_icon_enemy, y_icon_enemy), (size, size), img)
+        draw.text((x_text_enemy, y_text_enemy), tower_num_enemy, fill=(255, 5, 5, 255), font=font)
+        teams_box[2] = x_text_enemy + size_text_enemy[3]
+        teams_box[3] = y_icon_enemy + size
+
+        return img
+
+
+def paste_image(path, coords, size, img, mask=True):
+    with Image.open(path, 'r') as icon:
+        icon = icon.resize(size)
+        img.paste(icon, coords, mask=icon if mask else None)
 
 
 """
@@ -105,7 +166,6 @@ def AMH_picture(match: Match, lolData: LoLData):
         enemy_tower_path = res + 'images/lol/icon-tower-r.png'
         show_icon_objectives(ally_tower_path, tower_num_ally, teams_score_box, (-1, -1), img)
         show_icon_objectives(enemy_tower_path, tower_num_enemy, teams_score_box, (1, -1), img)
-        return img
 """
 
 """

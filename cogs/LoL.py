@@ -6,16 +6,19 @@ import os.path
 import AdvancedHistory
 import LoLAPI
 
-from PIL import ImageDraw, Image
-from pathlib import Path
-from discord import Interaction, Embed
+from discord import Interaction, Embed, option
 from discord.ext import commands, tasks
 from discord.ext.commands import Context
 from discord.ui import Button, View
 from Assets import assets
 from LoLMatch import Match
+from cogs.Checks import Checks
 
 res = assets() + 'League of Legends/'
+
+
+def regions(ctx):
+    return ['euw', 'br', 'eun', 'jp', 'kr', 'la', 'na', 'oc', 'tr', 'ru']
 
 
 class LimitedList:
@@ -23,10 +26,14 @@ class LimitedList:
         self.list = {}
         self.maxLength = max_length
 
-    def add(self, ele, key):
+    async def add(self, ele, key):
         self.list[key] = ele
         if len(self.list) > self.maxLength:
-            (k := next(iter(self.list)), self.list.pop(k))
+            k = next(iter(self.list))
+            View = discord.ui.View.from_message(k)
+            View.clear_items()
+            await k.edit(view=View)
+            self.list.pop(k)
 
         return len(self.list) - 1
 
@@ -47,44 +54,62 @@ class LoL(commands.Cog):
     async def actualise_data(self):
         self.LoLData.actualise()
 
-    @commands.command(help='Recharge la clé d\'API Riot', aliases=['api'])
-    async def reload_api_key(self, ctx: Context):
+    @Checks.is_owner()
+    @commands.slash_command(help='Recharge la clé d\'API Riot', aliases=['api'])
+    async def reload_api_key(self, ctx: discord.ApplicationContext):
         self.LoLData.reload_api_key()
-        await ctx.send('Reloaded Riot API key')
+        await ctx.respond('Reloaded Riot API key')
 
-    @commands.command(help='Montre l\'historique des X dernières parties de l\'invocateur donné. (par '
-                           'défaut 5 parties en normal)')
-    async def history(self, ctx: Context, summoner=None, games_count=None, region=None):
+    @commands.slash_command(help='Montre l\'historique des X dernières parties de l\'invocateur donné. (par '
+                                 'défaut 5 parties en normal)')
+    @option('summoner',
+            description="Enter a summoner name",
+            required=False,
+            default=None,
+            )
+    @option('games_count',
+            type=int,
+            description='Enter the number of games you want',
+            required=False,
+            min_value=1,
+            max_value=199,
+            defaul=5,
+            )
+    @option('region',
+            descrition='Enter your region',
+            required=False,
+            default=None,
+            autocomplete=regions)
+    async def history(self, ctx: discord.ApplicationContext, summoner=None, games_count=None, region=None):
         if summoner is None:
-            try:
-                with open(res + 'Registered_users.json', 'r') as fb:
-                    registered_users = json.load(fb)
-                author_id = str(ctx.message.author.id)
-                if author_id in registered_users:
-                    summoner_uuid = registered_users[author_id]
-                else:
-                    await ctx.send('Please give a summoner name or link your summoner name with `link_account`')
-                    return
-            except:
-                await ctx.send('Please give a summoner name or link your summoner name with `link_account`')
+            with open(res + 'Registered_users.json', 'r') as fb:
+                registered_users = json.load(fb)
+            author_id = str(ctx.author.id)
+            if author_id in registered_users:
+                summoner_uuid = registered_users[author_id]
+            else:
+                await ctx.respond('Please give a summoner name or link your summoner name with `link_account`')
                 return
         else:
             summoner_uuid = self.LoLData.get_player_uuid(summoner, region)
+
+        await ctx.defer(invisible=True)
 
         async with ctx.typing():
             history = self.LoLData.get_match_history(summoner_uuid, games_count)
             if history[1] is None:
                 if history[0] == 400:
-                    await ctx.send('Error 400, make sure you gave correct arguments.')
+                    await ctx.respond('Error 400, make sure you gave correct arguments.')
                     return
-                await ctx.send(f'Error {history[0]} happened during connection to Riot servers')
+                await ctx.respond(f'Error {history[0]} happened during connection to Riot servers')
                 return
             history = history[1]
             for data in history:
                 match = Match(data, summoner_uuid, self.LoLData.queues)
 
                 win = match.win()
-                embed = Embed(title='Victory' if win else 'Defeat',
+                title = 'Victory' if win else 'Defeat'
+                embed = Embed(title=title + '     ' + match.game_mode().lstrip('5v5 ').rstrip(' games'),
                               color=discord.Color.green() if win else discord.Color.red())
 
                 # For kayn, gets the transformation
@@ -113,13 +138,13 @@ class LoL(commands.Cog):
 
                 # Adds a button to show advanced stats
                 async def advanced_stats_callback(interaction: Interaction):
-                    if
-                    image = AdvancedHistory.AMH_picture(matchs.get(interaction.message.id), self.LoLData)
+                    message = interaction.message
+                    image = AdvancedHistory.AMH_picture(matchs.get(message), self.LoLData)
                     with io.BytesIO() as bites:
                         image.save(bites, format='PNG')
                         bites.seek(0)
                         file = discord.File(fp=bites, filename='champ_icon.png')
-                        await interaction.message.edit(content=None, embed=None, view=None, file=file)
+                        await message.edit(content=None, embed=None, view=None, file=file)
 
                 button = Button(label='Advanced stats')
                 button.callback = advanced_stats_callback
@@ -129,14 +154,18 @@ class LoL(commands.Cog):
                 # Send embed
                 msg = await ctx.send(embed=embed, file=champ_icon, view=view)
 
-                matchs.add(match, msg.id)
+                await matchs.add(match, msg)
 
-    @commands.command(help='Lie votre nom d\'invocateur LoL. Permet de rechercher votre historique de parties sans '
-                           'spécifier d\'invocateur', aliases=['link'])
-    async def link_account(self, ctx: Context, summoner):
+    @commands.slash_command(
+        help='Lie votre nom d\'invocateur LoL. Permet de rechercher votre historique de parties sans '
+             'spécifier d\'invocateur', aliases=['link'])
+    @option('summoner',
+            description='Enter your summoner name',
+            required=True)
+    async def link_account(self, ctx: discord.ApplicationContext, summoner):
         player_uuid = self.LoLData.get_player_uuid(summoner)
         if player_uuid == 400:
-            await ctx.send('Make sure summoner name is valid (do not use spaces)')
+            await ctx.respond('Make sure summoner name is valid (do not use spaces)')
             return
 
         if not os.path.isfile(res + 'Registered_users.json'):
@@ -144,11 +173,11 @@ class LoL(commands.Cog):
                 json.dump({}, fp)
         with open(res + 'Registered_users.json', 'r+') as fb:
             registered_users = json.load(fb)
-            registered_users[ctx.message.author.id] = player_uuid
+            registered_users[str(ctx.author.id)] = player_uuid
             fb.seek(0)
             json.dump(registered_users, fb, indent=4, separators=(',', ': '))
-        await ctx.send('Successfully linked discord account **{}** to summoner name **{}**'
-                       .format(ctx.message.author.name + '#' + ctx.message.author.discriminator, summoner))
+        await ctx.respond('Successfully linked discord account **{}** to summoner name **{}**'
+                          .format(ctx.author.name + '#' + ctx.author.discriminator, summoner))
 
 
 def setup(bot: discord.Bot):

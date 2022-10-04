@@ -133,6 +133,7 @@ class LoLData:
         summoner = requests.get(
             'https://{}.api.riotgames.com/lol/summoner/v4/summoners/by-name/{}'.format(region, summoner) + url_token)
         if summoner.status_code != 200:
+            print(summoner.status_code)
             return 400
         return summoner.json()['puuid']
 
