@@ -1,15 +1,12 @@
 import json
 import tracemalloc
 
-from discord import Option
 from discord.ext import commands
-from discord import option
 
-from Assets import assets
 from MyError import NoError
+from cogs.Checks import *
 from cogs.Display import Display
 from cogs.Voice import *
-from cogs.Checks import *
 
 # folder to search for res
 res = assets()
@@ -62,16 +59,16 @@ async def on_voice_state_updated(ctx, before, after):
     pass
 
 
-@bot.slash_command(name='reload', description='Reloads specified cog or all cogs if none are specified')
+@bot.slash_command(name='reload', description='Reloads specified cog or all cogs if `All`')
 @option('cog',
+        autocomplete=lambda ctx: [cog for cog in list(bot.cogs.keys()) + ['All'] if cog.lower().startswith(ctx.value.lower())],
         description="Enter a cog name",
-        required=False,
-        default=None,
-        autocomplete=lambda ctx : list(bot.cogs.keys())
+        input_type=str,
+        choices=list(bot.cogs.keys())
         )
 @Checks.is_owner()
-async def reload(ctx: discord.ApplicationContext, cog: str):
-    if cog is None:
+async def reload(ctx: discord.ApplicationContext, cog):
+    if cog == 'All':
         bot.unload_extension('cogs.MyHelp')
         bot.load_extension('cogs.MyHelp')
         Display.show_stats.stop()

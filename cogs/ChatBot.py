@@ -1,14 +1,15 @@
 import json
+import os.path
+from pathlib import Path
 
 import discord
 import requests
+from discord import ButtonStyle, option
 from discord.ext import commands, tasks
 from discord.ext.commands import Context
 from discord.ui import Button, View
-from discord import ButtonStyle
+
 from Assets import assets
-from MyError import NoError
-import json
 
 res = assets()
 
@@ -16,9 +17,14 @@ API_URL = 'https://api-inference.huggingface.co/models/Laggrif/'
 MODEL_NAME = 'DialoGPT-medium-Luke'
 huggingface_token = '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'
 
+Path(res + 'settings').mkdir(parents=True, exist_ok=True)
+
 
 def fetch_channel_ids():
-    with open(res + 'settings/Active_ChatBot_Channels.json', 'r') as fp:
+    path = res + 'settings/Active_ChatBot_Channels.json'
+    if not os.path.isfile(path):
+        open(path, 'w').write('{}')
+    with open(path, 'r') as fp:
         ids = json.load(fp)
     return ids
 
@@ -90,8 +96,16 @@ class ChatBot(commands.Cog):
                 # send the model's response to the Discord channel
                 await msg.channel.send(bot_response)
 
-    @commands.command(help='Enable the chatBot in the specified channel or the current channel')
+    @commands.slash_command(help='Enable the chatBot in the specified channel or the current channel')
+    @option('channel',
+            default=None,
+            description='Enter name of channel',
+            input_type=str,
+            required=False)
     async def add_chat_channel(self, ctx: Context, channel: str):
+
+        if channel is None:
+            await self.add_chat_channel(ctx, ctx.channel.name)
 
         chan = discord.utils.get(ctx.guild.channels, name=channel)
         if chan is None:
@@ -148,15 +162,14 @@ class ChatBot(commands.Cog):
 
         await ctx.send(embed=embed, view=view, delete_after=15)
 
-    @add_chat_channel.error
-    async def add_chat_channel_error(self, ctx: Context, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await self.add_chat_channel(ctx, ctx.channel.name)
-        else:
-            raise error
-
     @commands.command(help='Changes prefix of ChatBot in current channel. Type `None` or leave blank to remove prefix')
-    async def chat_prefix(self, ctx: Context, *, prefix):
+    @option('prefix',
+            autocomplete=['!', '$', '!c', '^', '?', '/', '&'],
+            default='',
+            description='Enter a prefix',
+            input_type=str,
+            required=False)
+    async def chat_prefix(self, ctx: Context, prefix):
         channel_id = str(ctx.channel.id)
 
         with open(res + 'settings/Active_Chatbot_Channels.json', 'r') as fp:
@@ -174,14 +187,6 @@ class ChatBot(commands.Cog):
 
         else:
             await ctx.send(f'ChatBot is not enabled in `{ctx.channel}`. You can add it with `add_chat_channel`')
-
-    @chat_prefix.error
-    async def chat_prefix_error(self, ctx: Context, error):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await self.chat_prefix(ctx, prefix="None")
-            print('err')
-        else:
-            raise error
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: Context, error):

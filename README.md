@@ -24,6 +24,7 @@ Use `sudo pip3 install` or `sudo python3 -m pip install` to install the followin
 * [py-cord](https://docs.pycord.dev/en/stable/)
 * [youtube_dl](https://github.com/ytdl-org/youtube-dl)
 * [psutil](https://github.com/giampaolo/psutil)
+* [PyNaCl](https://github.com/pyca/pynacl/)
 * [adafruit-circuitpython-ssd1306](https://github.com/adafruit/Adafruit_CircuitPython_SSD1306)
 * [pillow](https://python-pillow.org/)
 * [requests](https://requests.readthedocs.io/en/latest/)

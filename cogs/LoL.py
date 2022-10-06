@@ -1,24 +1,24 @@
 import io
 import json
-import discord
 import os.path
+
+import discord
+from discord import Interaction, Embed, option
+from discord.ext import commands, tasks
+from discord.ui import Button, View
 
 import AdvancedHistory
 import LoLAPI
-
-from discord import Interaction, Embed, option
-from discord.ext import commands, tasks
-from discord.ext.commands import Context
-from discord.ui import Button, View
 from Assets import assets
 from LoLMatch import Match
 from cogs.Checks import Checks
 
 res = assets() + 'League of Legends/'
 
+if not os.path.isfile(res + 'Registered_users.json'):
+    open(res + 'Registered_users.json', 'w').write('{}')
 
-def regions(ctx):
-    return ['euw', 'br', 'eun', 'jp', 'kr', 'la', 'na', 'oc', 'tr', 'ru']
+regions = ['euw', 'br', 'eun', 'jp', 'kr', 'la', 'na', 'oc', 'tr', 'ru']
 
 
 class LimitedList:
@@ -41,7 +41,7 @@ class LimitedList:
         return self.list.get(key)
 
 
-matchs = LimitedList(500)
+matches = LimitedList(500)
 
 
 class LoL(commands.Cog):
@@ -79,7 +79,7 @@ class LoL(commands.Cog):
             descrition='Enter your region',
             required=False,
             default=None,
-            autocomplete=regions)
+            choices=regions)
     async def history(self, ctx: discord.ApplicationContext, summoner=None, games_count=None, region=None):
         if summoner is None:
             with open(res + 'Registered_users.json', 'r') as fb:
@@ -139,7 +139,7 @@ class LoL(commands.Cog):
                 # Adds a button to show advanced stats
                 async def advanced_stats_callback(interaction: Interaction):
                     message = interaction.message
-                    image = AdvancedHistory.AMH_picture(matchs.get(message), self.LoLData)
+                    image = AdvancedHistory.AMH_picture(matches.get(message), self.LoLData)
                     with io.BytesIO() as bites:
                         image.save(bites, format='PNG')
                         bites.seek(0)
@@ -154,7 +154,7 @@ class LoL(commands.Cog):
                 # Send embed
                 msg = await ctx.send(embed=embed, file=champ_icon, view=view)
 
-                await matchs.add(match, msg)
+                await matches.add(match, msg)
 
     @commands.slash_command(
         help='Lie votre nom d\'invocateur LoL. Permet de rechercher votre historique de parties sans '

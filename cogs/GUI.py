@@ -1,8 +1,7 @@
-import discord
-from discord.ext import commands
 from discord.ui import Button, View
-from cogs.MyHelp import *
+
 from Assets import assets
+from cogs.MyHelp import *
 
 res = assets()
 
@@ -12,7 +11,7 @@ class GUI(commands.Cog):
         self.bot = bot
         self.ctx = None
 
-    @commands.command()
+    @commands.slash_command()
     async def command_panel(self, ctx):
         button = Button(label='Help')
         self.ctx = ctx

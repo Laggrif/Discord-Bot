@@ -1,16 +1,15 @@
-import asyncio
 import random
+from pathlib import Path
 
 import discord
-import youtube_dl
-import os
-import sys
-
 from discord import option
 from discord.ext import commands
+
 from Assets import assets
 
 res = assets()
+
+Path(res + 'suggestions').mkdir(parents=True, exist_ok=True)
 
 
 class Talking(commands.Cog):
@@ -80,7 +79,6 @@ class Talking(commands.Cog):
             description='Enter a suggestion')
     async def suggest(self, ctx, suggestion):
         async with ctx.typing():
-            if
             f = open(res + '/suggestions/sugg.txt', 'a')
             f.write(' '.join(suggestion) + '\n')
             f.close()
