@@ -104,6 +104,12 @@ class Match:
 
     # ------------------- player stats ---------------------
 
+    def items(self):
+        items = []
+        for i in range(7):
+            items.append(str(self.player_infos[f'item{i}']))
+        return items
+
     def kills(self):
         return self.player_infos['kills']
 
@@ -119,8 +125,20 @@ class Match:
     def first_blood_player(self):
         return self.player_infos['firstBloodKill']
 
-    def damage_dealt(self):
+    def damage_dealt_champ(self):
         return self.player_infos['totalDamageDealtToChampions']
+
+    def physic_damages_champ(self):
+        return self.player_infos['physicalDamageDealtToChampions']
+
+    def magic_damages_champ(self):
+        return self.player_infos['magicDamageDealtToChampions']
+
+    def true_damages_champ(self):
+        return self.player_infos['trueDamageDealtToChampions']
+
+    def total_damages(self):
+        return self.player_infos['totalDamageDealt']
 
     def damage_to_buildings(self):
         return self.player_infos['damageDealtToBuildings']

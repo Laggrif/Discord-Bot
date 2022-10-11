@@ -1,5 +1,7 @@
 from discord import ApplicationContext, option
+from discord.ext.commands import Bot
 
+from Assets import assets
 from YTDL import *
 
 res = assets()
@@ -7,11 +9,11 @@ res = assets()
 
 class Voice(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot: Bot):
         self.bot = bot
-        self.volume = 1
         self.source_queue = []
         self.player_queue = []
+        self.volume = 1
 
     @commands.slash_command(ignore_extra=False, help='Joins the channel you are in', aliases=['Join'])
     @option('channel',
@@ -19,25 +21,35 @@ class Voice(commands.Cog):
             description='Enter a voice channel',
             input_type=str,
             required=False)
-    async def join(self, ctx, channel, message=True):
+    @option('message',
+            default=True,
+            description='DO NOT USE! Whether bot should respond to you.',
+            input_type=bool,
+            required=False)
+    async def join(self, ctx: ApplicationContext, channel, message):
         if channel is None:
             try:
                 channel = ctx.author.voice.channel
+                print(channel)
             except:
                 await ctx.respond('Please join a channel or give a channel to join')
-                return
+                return None
 
-        for ch in ctx.guild.voice_channels:
-            if channel == ch.name:
-                channel = ch
-                break
         else:
-            await ctx.respond('Please enter a valid voice channel')
-            return
+            print('f')
+            for ch in ctx.guild.voice_channels:
+                if channel == ch.name:
+                    channel = ch
+                    break
+                else:
+                    await ctx.respond('Please enter a valid voice channel')
+                    return
 
         if ctx.voice_client is not None:
+            print('mov')
             await ctx.voice_client.move_to(channel)
         else:
+            print('conn', channel.guild)
             await channel.connect()
 
         if message:
@@ -49,21 +61,7 @@ class Voice(commands.Cog):
     async def leave(self, ctx: ApplicationContext):
         await ctx.voice_client.disconnect(force=True)
         await ctx.respond('Left voice channel')
-
-    @commands.slash_command(help='stops the music playing')
-    async def stop(self, ctx):
-        ctx.voice_client.stop()
-        await ctx.respond('Stopped voice')
-
-    @commands.slash_command()
-    async def pause(self, ctx):
-        ctx.voice_client.pause()
-        await ctx.respond('Paused voice')
-
-    @commands.slash_command()
-    async def resume(self, ctx):
-        ctx.voice_client.resume()
-        await ctx.respond('Resuming')
+        await self.purge(None)
 
     @commands.slash_command()
     async def volume(self, ctx, volume):
@@ -72,13 +70,6 @@ class Voice(commands.Cog):
         if ctx.voice_client is not None:
             ctx.voice_client.source.volume = volume / 100
         await ctx.respond(f'Changed volume to {volume}')
-
-    """
-    @commands.command()
-    async def loop(self, ctx):
-        if ctx.voice_client is not None:
-            ctx.voice_client.loop = not ctx.voice_client.loop
-    """
 
     @commands.slash_command(help='farts in the current channel or join the channel you are in')
     async def fart(self, ctx):
@@ -91,7 +82,7 @@ class Voice(commands.Cog):
         await ctx.delete(delay=0)
 
     @commands.slash_command()
-    async def info(self, ctx, *, url, message=True):
+    async def info(self, ctx, url, message=True):
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
             name = player.formated_filename
@@ -100,15 +91,14 @@ class Voice(commands.Cog):
             if os.path.isfile(res + f'downloads/{name}'):
                 available = 'in the database'
                 bool = True
-            print(res + f'downloads/{name}')
         if message:
             await ctx.respond(f'***{name}*** is {available}')
         return [player, name, bool]
 
     @commands.slash_command()
-    async def play(self, ctx, *, url):
+    async def play(self, ctx, url):
         if not self.bot.voice_clients:
-            ctx = await self.join(ctx, None, False)
+            ctx = await self.join(ctx, None, message=False)
         if ctx is None:
             return
 
@@ -117,46 +107,72 @@ class Voice(commands.Cog):
                 player = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(res + f'downloads/{url}'))
                 source = 'Database'
                 player.title = url
-                print(1)
             else:
                 infos = await Voice.info(ctx, url=url, message=False)
                 if infos[2]:
                     player = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(res + f'downloads/{infos[1]}'))
                     source = 'Database'
                     player.title = infos[1]
-                    print(2)
                 else:
                     player = infos[0]
                     source = 'Youtube'
-                    print(3)
+
+            self.player_queue.append(player)
+            self.source_queue.append(source)
             if ctx.voice_client.is_playing():
-                self.player_queue.append(player)
-                self.source_queue.append(source)
                 await ctx.respond(f'Added ***{player.title}*** to the queue')
                 return
             else:
+                await ctx.voice_client.play(player, after=lambda e: self.play_next(ctx))
                 await ctx.respond(f'Now playing: ***{player.title}***\nFrom {source}')
-                ctx.voice_client.play(player, after=await Voice.play_next(ctx))
                 return
 
+    @commands.slash_command(help='stops the music playing')
+    async def stop(self, ctx):
+        ctx.voice_client.stop()
+        self.player_queue = []
+        self.source_queue = []
+        await ctx.respond('Stopped voice and purged queue')
+
     @commands.slash_command()
-    async def play_next(self, ctx):
+    async def pause(self, ctx):
+        ctx.voice_client.pause()
+        await ctx.respond('Paused voice')
+
+    @commands.slash_command()
+    async def resume(self, ctx):
+        ctx.voice_client.resume()
+        await ctx.respond('Resuming')
+
+    @commands.slash_command()
+    async def loop(self, ctx):
+        if ctx.voice_client is not None:
+            ctx.voice_client.loop = not ctx.voice_client.loop
+            await ctx.respond('Loop is on' if ctx.voice_client.loop else 'Loop is off')
+        else:
+            await ctx.respond('Bot must be connected to a voice channel to enable looping')
+
+    def play_next(self, ctx):
         if len(self.player_queue) > 0:
-            while ctx.voice_client.is_playing():
-                print(ctx.voice_client.is_playing())
-            player = self.player_queue.pop(0)
-            source = self.source_queue.pop(0)
-            await ctx.respond(f'Now playing next: ***{player.title}***\nFrom {source}')
-            ctx.voice_client.play(player, after=await Voice.play_next(ctx))
+            if not ctx.voice_client.loop:
+                self.player_queue.pop(0)
+                self.source_queue.pop(0)
+
+        if len(self.player_queue) > 0:
+            player = self.player_queue[0]
+            source = self.source_queue[0]
+            ctx.voice_client.stop()
+            asyncio.run_coroutine_threadsafe(ctx.respond(f'Now playing: ***{player.title}***\nFrom {source}'),
+                                             self.bot.loop)
+            ctx.voice_client.play(player, after=lambda e: (self.play_next(ctx)))
 
     @commands.slash_command()
     async def next(self, ctx):
         if len(self.player_queue) > 0:
-            player = self.player_queue.pop(0)
-            source = self.source_queue.pop(0)
+            player = self.player_queue[0]
+            source = self.source_queue[0]
             ctx.voice_client.stop()
             await ctx.respond(f'Now playing: ***{player.title}***\nFrom {source}')
-            ctx.voice_client.play(player, after=await Voice.play_next(ctx))
         else:
             await ctx.respond('Queue is empty')
 
@@ -164,12 +180,18 @@ class Voice(commands.Cog):
     async def queue(self, ctx):
         queue_len = len(self.player_queue)
         if queue_len == 0:
-            await ctx.send('Queue is empty')
+            await ctx.respond('Queue is empty')
         else:
             embed = discord.Embed(title='Queue')
             for i in range(queue_len):
                 embed.add_field(name=str(i), value=self.player_queue[i].title, inline=False)
             await ctx.respond(embed=embed)
+
+    @commands.slash_command()
+    async def purge(self, ctx):
+        self.player_queue, self.source_queue = ([], [])
+        if ctx is not None:
+            await ctx.respond('Purged queue')
 
     @commands.slash_command()
     async def download(self, ctx, *, url):
@@ -182,6 +204,9 @@ class Voice(commands.Cog):
     @commands.slash_command(aliases=['dataBase', 'data', 'Data'])
     async def database(self, ctx):
         dir = res + 'downloads/'
+        if not os.path.exists(dir):
+            await ctx.respond('Database is Empty')
+            return
         await ctx.respond('Fetching database')
         async with ctx.typing():
             embed = discord.Embed(title='Database content')
@@ -201,7 +226,6 @@ class Voice(commands.Cog):
         except:
             await ctx.respond('Sorry, the selected file is too big')
 
-    @play.before_invoke
     @fart.before_invoke
     async def ensure_voice(self, ctx):
         if ctx.voice_client is None:
@@ -211,14 +235,8 @@ class Voice(commands.Cog):
         finally:
             return
 
-    @stop.after_invoke
-    @leave.after_invoke
-    async def purge(self, ctx):
-        self.player_queue = []
-        self.source_queue = []
-
-    @staticmethod
-    async def on_cog_error(ctx, error):
+    @commands.Cog.listener()
+    async def on_cog_error(self, ctx, error):
         if isinstance(error, commands.CommandNotFound):
             return
         else:

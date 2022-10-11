@@ -1,7 +1,8 @@
 import textwrap
 
-from cogs.Checks import *
 from discord.ext import commands, tasks
+
+from cogs.Checks import *
 
 # For OLED display support
 try:
@@ -82,9 +83,6 @@ class Display(commands.Cog):
             await display_logo(self.disp)
             # await asyncio.sleep(10)
             self.show_clock.start()
-        else:
-            channel = self.bot.get_channel(990261639486009344)
-            await channel.send('Display hasn\'t been loaded')
 
     @commands.Cog.listener()
     async def on_message(self, msg):

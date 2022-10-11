@@ -1,5 +1,4 @@
 import json
-import tracemalloc
 
 from discord.ext import commands
 
@@ -11,23 +10,9 @@ from cogs.Voice import *
 # folder to search for res
 res = assets()
 
-# Search the token for the right bot to launch
-with open(res + 'settings/Tokens.json', 'r') as fp:
-    bots = json.load(fp)["Bot"]
-    # Change "Esclave" for the name of your default bot
-    token = bots["Esclave"][0]
-    welcome_channel = bots['Esclave'][1]
-    if len(sys.argv) == 2:
-        arg = sys.argv[1]
-        if arg in bots:
-            token = bots[arg][0]
-            welcome_channel = bots[arg][1]
-
 # initialise bot
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="", intents=intents, debug_guilds=[944230321572962314])
-
-tracemalloc.start()
 
 
 @bot.event
@@ -61,7 +46,8 @@ async def on_voice_state_updated(ctx, before, after):
 
 @bot.slash_command(name='reload', description='Reloads specified cog or all cogs if `All`')
 @option('cog',
-        autocomplete=lambda ctx: [cog for cog in list(bot.cogs.keys()) + ['All'] if cog.lower().startswith(ctx.value.lower())],
+        autocomplete=lambda ctx: [cog for cog in list(bot.cogs.keys()) + ['All'] if
+                                  cog.lower().startswith(ctx.value.lower())],
         description="Enter a cog name",
         input_type=str,
         choices=list(bot.cogs.keys())
@@ -133,13 +119,30 @@ async def on_command_error(ctx, error):
     await bot.load_extension('Checks')
     await bot.load_extension('GUI')"""
 
-bot.load_extension('cogs.Talking')
-bot.load_extension('cogs.Voice')
-bot.load_extension('cogs.MyHelp')
-bot.load_extension('cogs.Display')
-bot.load_extension('cogs.Checks')
-bot.load_extension('cogs.GUI')
-bot.load_extension('cogs.ChatBot')
-bot.load_extension('cogs.LoL')
 
-bot.run(token)
+def run(which):
+    # Search the token for the right bot to launch
+    with open(res + 'settings/Tokens.json', 'r') as fp:
+        bots = json.load(fp)["Bot"]
+        token = bots[which][0]
+        global welcome_channel
+        welcome_channel = bots[which][1]
+
+    bot.load_extension('cogs.Talking')
+    bot.load_extension('cogs.Voice')
+    bot.load_extension('cogs.MyHelp')
+    bot.load_extension('cogs.Display')
+    bot.load_extension('cogs.Checks')
+    bot.load_extension('cogs.GUI')
+    bot.load_extension('cogs.ChatBot')
+    bot.load_extension('cogs.LoL')
+
+    bot.run(token)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) == 2:
+        run(sys.argv[1])
+    else:
+        # Change `Esclave` for the name of your default bot
+        run('Esclave')

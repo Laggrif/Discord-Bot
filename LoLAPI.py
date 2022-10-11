@@ -1,9 +1,10 @@
+import json
 import os.path
+from pathlib import Path
 
 import requests
-import json
+
 from Assets import assets
-from pathlib import Path
 
 res = assets() + 'League of Legends/Data'
 
@@ -24,6 +25,7 @@ class LoLData:
         self.current_ddragon_version = self.ddragon_versions_json[0]
         self.queues = self.get_queues()
         self.champ_list = self.get_champ_list()
+        self.item_list = self.get_item_list()
 
     def check_version_language(self, version, language):
         if version is None:
@@ -46,6 +48,7 @@ class LoLData:
         if self.current_ddragon_version != self.ddragon_versions_json[0]:
             self.current_ddragon_version = self.ddragon_versions_json[0]
             self.champ_list = self.get_champ_list()
+            self.item_list = self.get_item_list()
             self.queues = self.get_queues()
             self.get_all_champs_infos()
 
@@ -103,6 +106,35 @@ class LoLData:
 
         for champ in self.get_champ_list(version=version, language=language):
             self.get_champ_infos(champ, version, language)
+
+    def get_item_list(self, version=None, language=None):
+        version, language = self.check_version_language(version, language)
+
+        file_name = res + '/items_list_{}_{}.json'.format(version, language)
+
+        item_list_json = requests.get(
+            "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/item.json".format(version,
+                                                                                      language) + url_token)
+        with open(file_name, 'w') as fb:
+            json.dump(item_list_json.json(), fb, sort_keys=True, indent=4, separators=(',', ': '))
+
+        tmp_item_list = []
+        for item in item_list_json.json()['data']:
+            tmp_item_list.append(str(item))
+        return tmp_item_list
+
+    def get_item_icon(self, item_id, version=None):
+        if item_id not in self.item_list:
+            return 400
+
+        version, language = self.check_version_language(version, None)
+
+        if not os.path.isfile(assets() + 'images/lol/Items_icons/{}/{}.png'.format(version, item_id)):
+            image = requests.get(
+                'https://ddragon.leagueoflegends.com/cdn/{}/img/item/{}.png'.format(version, item_id)).content
+            Path(assets() + 'images/lol/Items_icons/{}'.format(version)).mkdir(parents=True, exist_ok=True)
+            with open(assets() + 'images/lol/Items_icons/{}/{}.png'.format(version, item_id), 'wb') as fb:
+                fb.write(image)
 
     def get_player_uuid(self, summoner, region=None):
         if region is None:

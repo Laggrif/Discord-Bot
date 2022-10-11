@@ -72,7 +72,7 @@ class LoL(commands.Cog):
             description='Enter the number of games you want',
             required=False,
             min_value=1,
-            max_value=199,
+            max_value=100,
             defaul=5,
             )
     @option('region',

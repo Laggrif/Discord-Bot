@@ -60,6 +60,7 @@ def AMH_picture(match: Match, lolData: LoLData):
         x = WIDTH - MARGIN - ICON_SIZE
         y = MARGIN
         draw.rectangle((x - 1, y - 1, x + ICON_SIZE, y + ICON_SIZE))
+        lolData.get_champ_icon(match.champion())
         paste_image(res + f'images/lol/Champions_icons/{lolData.current_ddragon_version}/{match.champion()}.png',
                     (x, y), (240, 240), img, mask=False)
         champ_icon_box = (x, y, x + ICON_SIZE, y + ICON_SIZE)
@@ -147,6 +148,137 @@ def AMH_picture(match: Match, lolData: LoLData):
         draw.text((x_text_enemy, y_text_enemy), tower_num_enemy, fill=(255, 5, 5, 255), font=font)
         teams_box[2] = x_text_enemy + size_text_enemy[3]
         teams_box[3] = y_icon_enemy + size
+
+        # ------------- damages dealt -------------------------
+
+        #                           -----static text----
+        # title
+        font = ImageFont.truetype(FONT, 40)
+        text = 'Damages dealt'
+        x = 30
+        y = champion_box[3] + 300
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        title_damages_box = draw.textbbox((x, y), text, font=font)
+
+        # total damages dealt (champ)
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Damages to champions'
+        x = title_damages_box[0]
+        y = title_damages_box[3] + 40
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        damages_champ_text_box = draw.textbbox((x, y), text, font=font)
+
+        # physical damages dealt
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Physical damages dealt'
+        y = damages_champ_text_box[3] + 3 * MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        physic_damages_champ_text_box = draw.textbbox((x, y), text, font=font)
+
+        # magical damages dealt
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Magical damages dealt'
+        y = physic_damages_champ_text_box[3] + 3 * MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        magic_damages_champ_text_box = draw.textbbox((x, y), text, font=font)
+
+        # true damages dealt
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'True damages dealt'
+        y = magic_damages_champ_text_box[3] + 3 * MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        true_damages_champ_text_box = draw.textbbox((x, y), text, font=font)
+
+        # damages to towers
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Damages to towers'
+        y = true_damages_champ_text_box[3] + 3 * MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        tower_damages_text_box = draw.textbbox((x, y), text, font=font)
+
+        # damages to objectives
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Damages to objectives'
+        y = tower_damages_text_box[3] + 3 * MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        objectives_damages_text_box = draw.textbbox((x, y), text, font=font)
+
+        # total damages (global)
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Total damages dealt'
+        y = objectives_damages_text_box[3] + 3 * MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        total_damages_text_box = draw.textbbox((x, y), text, font=font)
+
+        #                       ------statistics text-----
+
+        # total damages dealt (champ)
+        font = ImageFont.truetype(FONT, 30)
+        text = f'{match.damage_dealt_champ():,d}'.replace(',', ' ')
+        x = damages_champ_text_box[0] + 320
+        y = damages_champ_text_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        damages_champ_box = draw.textbbox((x, y), text, font=font)
+
+        # physical damages dealt
+        font = ImageFont.truetype(FONT, 30)
+        text = f'{match.physic_damages_champ():,d}'.replace(',', ' ')
+        y = physic_damages_champ_text_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        physic_damages_champ_box = draw.textbbox((x, y), text, font=font)
+
+        # magical damages dealt
+        font = ImageFont.truetype(FONT, 30)
+        damages = f'{match.magic_damages_champ():,d}'.replace(',', ' ')
+        y = magic_damages_champ_text_box[1]
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        magic_damages_champ_box = draw.textbbox((x, y), text, font=font)
+
+        # true damages dealt
+        font = ImageFont.truetype(FONT, 30)
+        damages = f'{match.true_damages_champ():,d}'.replace(',', ' ')
+        y = true_damages_champ_text_box[1]
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        true_damages_champ_box = draw.textbbox((x, y), text, font=font)
+
+        # damages to towers
+        font = ImageFont.truetype(FONT, 30)
+        damages = f'{match.damage_to_buildings():,d}'.replace(',', ' ')
+        y = tower_damages_text_box[1]
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        tower_damages_box = draw.textbbox((x, y), text, font=font)
+
+        # damages to objectives
+        font = ImageFont.truetype(FONT, 30)
+        damages = f'{match.damage_to_objectives():,d}'.replace(',', ' ')
+        y = objectives_damages_text_box[1]
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        objectives_damages_box = draw.textbbox((x, y), text, font=font)
+
+        # total damages (global)
+        font = ImageFont.truetype(FONT, 30)
+        damages = f'{match.total_damages():,d}'.replace(',', ' ')
+        y = total_damages_text_box[1]
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        total_damages_box = draw.textbbox((x, y), text, font=font)
+
+        # ----------------------- Items ------------------------------------------------
+
+        items = match.items()
+        x = 70
+        y = int((title_damages_box[1] - time_spent_box[3]) / 2 + time_spent_box[3] - 96 / 2)
+        for i in range(7):
+            draw.rectangle((i * 97 + 70 - 1, y - 1, (i + 1) * 97 + 70 - 1, y + 96),
+                           outline=(200, 200, 200, 255),
+                           fill=(0, 0, 0, 90))
+            if items[i] != '0':
+                lolData.get_item_icon(items[i])
+                paste_image(res + f'images/lol/Items_icons/{lolData.current_ddragon_version}/{items[i]}.png',
+                            (i * 97 + x, y),
+                            (96, 96),
+                            img,
+                            False)
+        items_box = [x, y, x + 7 * 97, y + 97]
 
         return img
 
