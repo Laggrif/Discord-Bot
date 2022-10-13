@@ -15,6 +15,14 @@ ICON_SIZE = 240
 
 MARGIN = 5
 
+STATS_MARGIN = 10
+
+
+def paste_image(path, coords, size, img, mask=True):
+    with Image.open(path, 'r') as icon:
+        icon = icon.resize(size)
+        img.paste(icon, coords, mask=icon if mask else None)
+
 
 def AMH_picture(match: Match, lolData: LoLData):
 
@@ -56,6 +64,8 @@ def AMH_picture(match: Match, lolData: LoLData):
         draw.text((x, y), date, fill=(200, 200, 200, 255), font=font)
         date_spent_box = draw.textbbox((x, y), time, font)
 
+        # ---------------------------------- Champ ---------------------------------------------------------------------
+
         # champ icon
         x = WIDTH - MARGIN - ICON_SIZE
         y = MARGIN
@@ -74,6 +84,8 @@ def AMH_picture(match: Match, lolData: LoLData):
         y = champ_icon_box[3] + MARGIN
         draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
         champion_box = draw.textbbox((x, y), text, font)
+
+        # ------------------------------------------- scores and objectives --------------------------------------------
 
         # Teams score
         font = ImageFont.truetype(FONT, 40)
@@ -149,85 +161,85 @@ def AMH_picture(match: Match, lolData: LoLData):
         teams_box[2] = x_text_enemy + size_text_enemy[3]
         teams_box[3] = y_icon_enemy + size
 
-        # ------------- damages dealt -------------------------
+        # ------------------------------ damages dealt -----------------------------------------------------------------
 
         #                           -----static text----
         # title
         font = ImageFont.truetype(FONT, 40)
-        text = 'Damages dealt'
+        text = 'Offensive Statistics'
         x = 30
         y = champion_box[3] + 300
         draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
-        title_damages_box = draw.textbbox((x, y), text, font=font)
+        title_offense_box = draw.textbbox((x, y), text, font=font)
 
         # total damages dealt (champ)
         font = ImageFont.truetype(FONT, 30)
         damages = 'Damages to champions'
-        x = title_damages_box[0]
-        y = title_damages_box[3] + 40
+        x = title_offense_box[0]
+        y = title_offense_box[3] + 40
         draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        damages_champ_text_box = draw.textbbox((x, y), text, font=font)
+        damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
 
-        # physical damages dealt
+        # physic damages dealt
         font = ImageFont.truetype(FONT, 30)
-        damages = 'Physical damages dealt'
-        y = damages_champ_text_box[3] + 3 * MARGIN
+        damages = 'Physic damages dealt'
+        y = damages_champ_text_box[3] + STATS_MARGIN
         draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        physic_damages_champ_text_box = draw.textbbox((x, y), text, font=font)
+        physic_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
 
-        # magical damages dealt
+        # magic damages dealt
         font = ImageFont.truetype(FONT, 30)
-        damages = 'Magical damages dealt'
-        y = physic_damages_champ_text_box[3] + 3 * MARGIN
+        damages = 'Magic damages dealt'
+        y = physic_damages_champ_text_box[3] + STATS_MARGIN
         draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        magic_damages_champ_text_box = draw.textbbox((x, y), text, font=font)
+        magic_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
 
         # true damages dealt
         font = ImageFont.truetype(FONT, 30)
         damages = 'True damages dealt'
-        y = magic_damages_champ_text_box[3] + 3 * MARGIN
+        y = magic_damages_champ_text_box[3] + STATS_MARGIN
         draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        true_damages_champ_text_box = draw.textbbox((x, y), text, font=font)
+        true_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
 
         # damages to towers
         font = ImageFont.truetype(FONT, 30)
         damages = 'Damages to towers'
-        y = true_damages_champ_text_box[3] + 3 * MARGIN
+        y = true_damages_champ_text_box[3] + STATS_MARGIN
         draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        tower_damages_text_box = draw.textbbox((x, y), text, font=font)
+        tower_damages_text_box = draw.textbbox((x, y), damages, font=font)
 
         # damages to objectives
         font = ImageFont.truetype(FONT, 30)
         damages = 'Damages to objectives'
-        y = tower_damages_text_box[3] + 3 * MARGIN
+        y = tower_damages_text_box[3] + STATS_MARGIN
         draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        objectives_damages_text_box = draw.textbbox((x, y), text, font=font)
+        objectives_damages_text_box = draw.textbbox((x, y), damages, font=font)
 
         # total damages (global)
         font = ImageFont.truetype(FONT, 30)
         damages = 'Total damages dealt'
-        y = objectives_damages_text_box[3] + 3 * MARGIN
+        y = objectives_damages_text_box[3] + STATS_MARGIN
         draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        total_damages_text_box = draw.textbbox((x, y), text, font=font)
+        total_damages_text_box = draw.textbbox((x, y), damages, font=font)
 
         #                       ------statistics text-----
 
         # total damages dealt (champ)
         font = ImageFont.truetype(FONT, 30)
         text = f'{match.damage_dealt_champ():,d}'.replace(',', ' ')
-        x = damages_champ_text_box[0] + 320
+        x = damages_champ_text_box[2] + 100
         y = damages_champ_text_box[1]
         draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
         damages_champ_box = draw.textbbox((x, y), text, font=font)
 
-        # physical damages dealt
+        # physic damages dealt
         font = ImageFont.truetype(FONT, 30)
         text = f'{match.physic_damages_champ():,d}'.replace(',', ' ')
         y = physic_damages_champ_text_box[1]
         draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
         physic_damages_champ_box = draw.textbbox((x, y), text, font=font)
 
-        # magical damages dealt
+        # magic damages dealt
         font = ImageFont.truetype(FONT, 30)
         damages = f'{match.magic_damages_champ():,d}'.replace(',', ' ')
         y = magic_damages_champ_text_box[1]
@@ -262,11 +274,184 @@ def AMH_picture(match: Match, lolData: LoLData):
         draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
         total_damages_box = draw.textbbox((x, y), text, font=font)
 
-        # ----------------------- Items ------------------------------------------------
+        # ------------------------------------------ defensive stats ---------------------------------------------------
 
+        # defines size of box containing defensive stats
+        width = WIDTH / 2
+        defense_box = [width - 225, 0, width + 225, 0]
+
+        #                   -------------static text--------------
+        # title
+        font = ImageFont.truetype(FONT, 40)
+        text = 'Defensive Statistics'
+        x = WIDTH / 2 - draw.textlength(text, font) / 2
+        y = title_offense_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        title_defense_box = draw.textbbox((x, y), text, font=font)
+
+        # damages taken
+        font = ImageFont.truetype(FONT, 30)
+        text = 'Damages taken'
+        x = defense_box[0]
+        y = title_defense_box[3] + 40
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        damages_taken_text_box = draw.textbbox((x, y), text, font=font)
+
+        # physic damages taken
+        text = 'Physic damages taken'
+        y = damages_taken_text_box[3] + STATS_MARGIN
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        physic_damages_taken_text_box = draw.textbbox((x, y), text, font=font)
+
+        # magic damages taken
+        text = 'Magic damages taken'
+        y = physic_damages_taken_text_box[3] + STATS_MARGIN
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        magic_damages_taken_text_box = draw.textbbox((x, y), text, font=font)
+
+
+        # true damages taken
+        text = 'True damages taken'
+        y = magic_damages_taken_text_box[3] + STATS_MARGIN
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        true_damages_taken_text_box = draw.textbbox((x, y), text, font=font)
+
+        # damages mitigated
+        text = 'Damages mitigated'
+        y = true_damages_taken_text_box[3] + STATS_MARGIN
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        damages_mitigated_text_box = draw.textbbox((x, y), text, font=font)
+
+        # self-healing
+        text = 'Self healing'
+        y = damages_mitigated_text_box[3] + STATS_MARGIN
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        self_healing_text_box = draw.textbbox((x, y), text, font=font)
+
+        # cc taken
+        text = 'CC taken'
+        y = self_healing_text_box[3] + STATS_MARGIN
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        cc_taken_text_box = draw.textbbox((x, y), text, font=font)
+
+        #                    ------------------statistics text---------------
+        # damages taken
+        font = ImageFont.truetype(FONT, 30)
+        text = f'{match.damage_taken():,d}'.replace(',', ' ')
+        x = defense_box[2] - draw.textlength(text, font)
+        y = damages_taken_text_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        damages_taken_box = draw.textbbox((x, y), text, font=font)
+
+        # physic damages taken
+        text = f'{match.physic_damage_taken():,d}'.replace(',', ' ')
+        x = defense_box[2] - draw.textlength(text, font)
+        y = physic_damages_taken_text_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        physic_damages_taken_box = draw.textbbox((x, y), text, font=font)
+
+        # magic damages taken
+        text = f'{match.magic_damage_taken():,d}'.replace(',', ' ')
+        x = defense_box[2] - draw.textlength(text, font)
+        y = magic_damages_taken_text_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        magic_damages_taken_box = draw.textbbox((x, y), text, font=font)
+
+        # true damages taken
+        text = f'{match.true_damage_taken():,d}'.replace(',', ' ')
+        x = defense_box[2] - draw.textlength(text, font)
+        y = true_damages_taken_text_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        true_damages_taken_box = draw.textbbox((x, y), text, font=font)
+
+        # damages mitigated
+        text = f'{match.damage_mitigated():,d}'.replace(',', ' ')
+        x = defense_box[2] - draw.textlength(text, font)
+        y = damages_mitigated_text_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        mitigated_damages_box = draw.textbbox((x, y), text, font=font)
+
+        # self-healing
+        text = f'{match.heal_self():,d}'.replace(',', ' ')
+        x = defense_box[2] - draw.textlength(text, font)
+        y = self_healing_text_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        self_healing_box = draw.textbbox((x, y), text, font=font)
+
+        # cc taken
+        text = f'{match.cc_taken():,d}'.replace(',', ' ')
+        x = defense_box[2] - draw.textlength(text, font)
+        y = cc_taken_text_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        cc_taken_box = draw.textbbox((x, y), text, font=font)
+
+        # --------------------------- Utility stats --------------------------------------------------------------------
+
+        #                    -------------- static text ------------------------
+        # utility box
+        utility_box = [WIDTH - 580, 0, WIDTH - 30, 0]
+
+        # title
+        font = ImageFont.truetype(FONT, 40)
+        text = 'Utility Statistics'
+        x = utility_box[0]
+        y = title_offense_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        title_utility_box = draw.textbbox((x, y), text, font=font)
+
+        # cc done
+        font = ImageFont.truetype(FONT, 30)
+        text = 'CC done'
+        y = title_utility_box[3] + 40
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        cc_done_text_box = draw.textbbox((x, y), text, font=font)
+
+        # shield to allies
+        text = 'Shields on allies'
+        y = cc_done_text_box[3] + STATS_MARGIN
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        shield_ally_text_box = draw.textbbox((x, y), text, font=font)
+
+        # heals on allies
+        text = 'Heals on allies'
+        y = shield_ally_text_box[3] + STATS_MARGIN
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        heals_ally_text_box = draw.textbbox((x, y), text, font=font)
+
+        # time spent dead
+        text = 'Time spent dead'
+        y = heals_ally_text_box[3] + STATS_MARGIN
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        time_dead_text_box = draw.textbbox((x, y), text, font=font)
+
+        # vision score
+        text = 'Vision score'
+        y = time_dead_text_box[3] + STATS_MARGIN
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        vision_score_text_box = draw.textbbox((x, y), text, font=font)
+
+        #               ----------------- statistics text -----------------------
+        # cc done
+        text = f'{match.cc_given():,d}'.replace(',', ' ')
+        x = utility_box[2] - draw.textlength(text, font)
+        y = cc_done_text_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        cc_done_box = draw.textbbox((x, y), text, font=font)
+
+        # shield to allies
+        text = f'{match.shield_other():,d}'.replace(',', ' ')
+        x = utility_box[2] - draw.textlength(text, font)
+        y = shield_ally_text_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        shield_ally_box = draw.textbbox((x, y), text, font=font)
+
+
+        # ----------------------- Items --------------------------------------------------------------------------------
+
+        # items icons
         items = match.items()
         x = 70
-        y = int((title_damages_box[1] - time_spent_box[3]) / 2 + time_spent_box[3] - 96 / 2)
+        y = int((title_offense_box[1] - time_spent_box[3]) / 2 + time_spent_box[3] - 96 / 2)
         for i in range(7):
             draw.rectangle((i * 97 + 70 - 1, y - 1, (i + 1) * 97 + 70 - 1, y + 96),
                            outline=(200, 200, 200, 255),
@@ -280,32 +465,39 @@ def AMH_picture(match: Match, lolData: LoLData):
                             False)
         items_box = [x, y, x + 7 * 97, y + 97]
 
+        # gold earned
+        font = ImageFont.truetype(FONT, 30)
+        earned = str(match.gold_earned()) + ' Gold earned'
+        gold_earned_size = draw.textbbox((0, 0), earned, font)
+        x = items_box[2] + 50
+        y = items_box[1] + MARGIN
+        draw.text((x, y), earned, fill=(255, 215, 0, 255), font=font)
+        gold_earned_box = draw.textbbox((x, y), earned, font)
+
+        # gold spent
+        font = ImageFont.truetype(FONT, 30)
+        spent = str(match.gold_spent()) + ' Gold spent'
+        x = gold_earned_box[0]
+        y = items_box[3] - gold_earned_size[3] - MARGIN
+        draw.text((x, y), spent, fill=(255, 215, 0, 255), font=font)
+        gold_spent_box = draw.textbbox((x, y), spent, font)
+
+        # ----------------------------- summoner spells ----------------------------------------------------------------
+        # spell 1
+        sums = match.summoners()
+        m = max(gold_spent_box[2], gold_earned_box[2])
+        x = int((WIDTH - m) / 2 + m - 97)
+        y = items_box[1]
+        for i in range(2):
+            draw.rectangle((x + 97 * i - 1, y - 1, x + 97 * i + 97 - 1, y + 97),
+                           outline=(200, 200, 200, 255),
+                           fill=(0, 0, 0, 90))
+            lolData.get_sum_icon(sums[i])
+            paste_image(res + f'images/lol/Summoner_spells_icons/{lolData.current_ddragon_version}/{sums[i]}.png',
+                        (i * 97 + x, y),
+                        (96, 96),
+                        img,
+                        False)
+        sums_box = [x, y, x + 2 * 97, y + 97]
+
         return img
-
-
-def paste_image(path, coords, size, img, mask=True):
-    with Image.open(path, 'r') as icon:
-        icon = icon.resize(size)
-        img.paste(icon, coords, mask=icon if mask else None)
-
-
-"""
-        # towers destroyed
-        font = ImageFont.truetype(FONT, 40)
-        tower_num_ally = int(match.team_turret_kills())
-        ally_tower_path = res + 'images/lol/icon-tower.png'
-        tower_num_enemy = int(match.enemy_turret_kills())
-        enemy_tower_path = res + 'images/lol/icon-tower-r.png'
-        show_icon_objectives(ally_tower_path, tower_num_ally, teams_score_box, (-1, -1), img)
-        show_icon_objectives(enemy_tower_path, tower_num_enemy, teams_score_box, (1, -1), img)
-"""
-
-"""
-def show_icon_objectives(path, num, box, pos, img):
-    for i in range(num):
-        anchor_x = box[0 if pos[0] == -1 else 2]
-        coord = (int(anchor_x + pos[0] * 45 * (i + 1)), int((box[1] + box[3]) / 2 + pos[1] * 45))
-        with Image.open(path, 'r') as icon:
-            icon = icon.resize((40, 40))
-            img.paste(icon, coord, mask=icon)
-"""

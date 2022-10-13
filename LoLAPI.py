@@ -26,6 +26,7 @@ class LoLData:
         self.queues = self.get_queues()
         self.champ_list = self.get_champ_list()
         self.item_list = self.get_item_list()
+        self.sums_list = self.get_sums_list()
 
     def check_version_language(self, version, language):
         if version is None:
@@ -49,6 +50,7 @@ class LoLData:
             self.current_ddragon_version = self.ddragon_versions_json[0]
             self.champ_list = self.get_champ_list()
             self.item_list = self.get_item_list()
+            self.sums_list = self.get_sums_list()
             self.queues = self.get_queues()
             self.get_all_champs_infos()
 
@@ -134,6 +136,37 @@ class LoLData:
                 'https://ddragon.leagueoflegends.com/cdn/{}/img/item/{}.png'.format(version, item_id)).content
             Path(assets() + 'images/lol/Items_icons/{}'.format(version)).mkdir(parents=True, exist_ok=True)
             with open(assets() + 'images/lol/Items_icons/{}/{}.png'.format(version, item_id), 'wb') as fb:
+                fb.write(image)
+
+    def get_sums_list(self, version=None, language=None):
+        version, language = self.check_version_language(version, language)
+
+        file_name = res + '/sums_list_{}_{}.json'.format(version, language)
+
+        sums_list_json = requests.get(
+            "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/summoner.json".format(version,
+                                                                                      language) + url_token)
+        with open(file_name, 'w') as fb:
+            json.dump(sums_list_json.json(), fb, sort_keys=True, indent=4, separators=(',', ': '))
+
+        tmp_sums_list = {}
+        for sum in sums_list_json.json()['data']:
+            tmp_sums_list[sums_list_json.json()['data'][sum]['key']] = sum
+        return tmp_sums_list
+
+    def get_sum_icon(self, sum_id, version=None):
+        if sum_id not in self.sums_list.keys():
+            return 400
+
+        version, language = self.check_version_language(version, None)
+
+        if not os.path.isfile(assets() + 'images/lol/Summoner_spells_icons/{}/{}.png'.format(version, sum_id)):
+            image = requests.get(
+                'https://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}.png'
+                .format(version, self.sums_list[sum_id]))\
+                .content
+            Path(assets() + 'images/lol/Summoner_spells_icons/{}'.format(version)).mkdir(parents=True, exist_ok=True)
+            with open(assets() + 'images/lol/Summoner_spells_icons/{}/{}.png'.format(version, sum_id), 'wb') as fb:
                 fb.write(image)
 
     def get_player_uuid(self, summoner, region=None):

@@ -110,6 +110,12 @@ class Match:
             items.append(str(self.player_infos[f'item{i}']))
         return items
 
+    def summoners(self):
+        sums = []
+        for i in range(1, 3):
+            sums.append(str(self.player_infos[f'summoner{i}Id']))
+        return sums
+
     def kills(self):
         return self.player_infos['kills']
 
@@ -149,6 +155,15 @@ class Match:
     def damage_taken(self):
         return self.player_infos['totalDamageTaken']
 
+    def physic_damage_taken(self):
+        return self.player_infos['physicalDamageTaken']
+
+    def magic_damage_taken(self):
+        return self.player_infos['magicDamageTaken']
+
+    def true_damage_taken(self):
+        return self.player_infos['trueDamageTaken']
+
     def damage_mitigated(self):
         return self.player_infos['damageSelfMitigated']
 
@@ -158,6 +173,9 @@ class Match:
     def heal_others(self):
         return self.player_infos['totalHealsOnTeammates']
 
+    def shield_other(self):
+        return self.player_infos['totalDamageShieldedOnTeammates']
+
     def minions_killed(self):
         return self.player_infos['totalMinionsKilled']
 
@@ -165,7 +183,7 @@ class Match:
         return self.player_infos['visionScore']
 
     def cc_given(self):
-        return self.player_infos['totalTimeCCingOthers']
+        return self.player_infos['timeCCingOthers']
 
     def cc_taken(self):
         """
