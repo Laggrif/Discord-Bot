@@ -8,11 +8,11 @@ from cogs.Display import Display
 from cogs.Voice import *
 
 # folder to search for res
-res = assets()
+res = Assets.assets()
 
 # initialise bot
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix="", intents=intents, debug_guilds=[944230321572962314])
+bot = commands.Bot(command_prefix="", intents=intents, debug_guilds=[944230321572962314, 501076532975108098])
 
 
 @bot.event

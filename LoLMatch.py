@@ -193,7 +193,7 @@ class Match:
         return self.player_infos['totalTimeCCDealt']
 
     def level(self):
-        return self.player_infos['championLevel']
+        return self.player_infos['champLevel']
 
     def champion(self):
         return self.player_infos['championName']
@@ -218,3 +218,6 @@ class Match:
         minutes = time / 60
         seconds = time - minutes * 60
         return '{}:{:02d}'.format(minutes, seconds)
+
+    def time_dead(self):
+        return self.player_infos['totalTimeSpentDead']
