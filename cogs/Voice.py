@@ -15,17 +15,16 @@ class VoiceClients:
         self.source_queue = []
         self.player_queue = []
         self.voice = voice
-        self.loop = False
         self.is_playing = False
-        self.volume = 60
+        self.loop = False
+        self.volume = 0.6
 
         with open(res + 'settings/Voice.json', 'r') as fp:
             settings = json.load(fp)
         if str(guild_id) not in settings.keys():
-            settings[guild_id] = {'volume': self.volume}
-            with open(res + 'settings/Voice.json', 'w+') as fp:
+            settings[guild_id] = {'volume': self.volume, 'loop': self.loop}
+            with open(res + 'settings/Voice.json', 'w') as fp:
                 json.dump(settings, fp, indent=4, separators=(',', ': '))
-            self.volume = 60
         else:
             self.volume = settings[str(guild_id)]['volume']
 
@@ -34,21 +33,30 @@ class VoiceClients:
         self.source_queue.append(source)
         return self
 
+    def add_song_now(self, player, source):
+        self.player_queue.insert(0, player)
+        self.source_queue.insert(0, source)
+        return self
+
     def set_volume(self, volume):
-        self.voice.source.volume = volume
+        if self.voice and self.voice.source:
+            self.voice.source.volume = volume
+
         self.volume = volume
         with open(res + 'settings/Voice.json', 'r+') as fp:
             settings = json.load(fp)
-            settings[str(self.guild_id)]['volume'] = volume
-            json.dump(settings, fp)
+        settings[str(self.guild_id)]['volume'] = volume
+        with open(res + 'settings/Voice.json', 'w') as fp:
+            json.dump(settings, fp, indent=4, separators=(',', ': '))
         return self
 
     def toggle_loop(self):
         self.loop = not self.loop
         with open(res + 'settings/Voice.json', 'r+') as fp:
             settings = json.load(fp)
-            settings[str(self.guild_id)]['loop'] = self.loop
-            json.dump(settings, fp)
+        settings[str(self.guild_id)]['loop'] = self.loop
+        with open(res + 'settings/Voice.json', 'w') as fp:
+            json.dump(settings, fp, indent=4, separators=(',', ': '))
         return self
 
     def move_to(self, voice):
@@ -56,13 +64,11 @@ class VoiceClients:
         return self
 
     def play(self):
-        print('play')
         self.voice.source.volume = self.volume
         self.is_playing = True
         return self
 
-    def pause(self, error=None):
-        print('pause', error if error is not None else '')
+    def pause(self):
         self.is_playing = False
         return self
 
@@ -77,13 +83,21 @@ class VoiceClients:
     def pop2(self):
         self.player_queue.pop(0)
         self.source_queue.pop(0)
-        return self.player_queue[0], self.source_queue[0]
+        if not self.is_empty():
+            return self.player_queue[0], self.source_queue[0]
 
     def has_next(self):
-        return True if len(self.player_queue) > 1 else False
+        return len(self.player_queue) > 1
 
     def is_empty(self):
-        return True if len(self.player_queue) < 0 else False
+        return len(self.player_queue) <= 0
+
+    def remove(self):
+        with open(res + 'settings/Voice.json', 'r+') as fp:
+            settings = json.load(fp)
+        del settings[str(self.guild_id)]
+        with open(res + 'settings/Voice.json', 'w') as fp:
+            json.dump(settings, fp, indent=4, separators=(',', ': '))
 
 
 class Voice(commands.Cog):
@@ -91,8 +105,21 @@ class Voice(commands.Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
         self.voice_clients = dict()
+
+    @commands.Cog.listener()
+    async def on_ready(self):
         for guild in self.bot.guilds:
             self.voice_clients[guild.id] = VoiceClients(guild.voice_client, guild.id)
+
+    @commands.Cog.listener()
+    async def on_guild_join(self, guild):
+        self.voice_clients[guild.id] = VoiceClients(guild.voice_client, guild.id)
+
+    @commands.Cog.listener()
+    async def on_guild_remove(self, guild):
+        id = guild.id
+        self.voice_clients[id].remove()
+        del self.voice_clients[id]
 
     @commands.slash_command(ignore_extra=False, help='Joins the channel you are in', aliases=['Join'])
     @option('channel',
@@ -127,7 +154,6 @@ class Voice(commands.Cog):
         guild_id = ctx.guild.id
         if ctx.voice_client is not None:
             await ctx.voice_client.move_to(channel)
-            self.voice_clients[guild_id].move_to(ctx.voice_client)
         else:
             await channel.connect()
         self.voice_clients[guild_id].move_to(ctx.voice_client)
@@ -146,14 +172,8 @@ class Voice(commands.Cog):
 
     @commands.slash_command()
     async def volume(self, ctx, volume):
-        guild_id = ctx.guild.id
         vol = float(volume) / 100.0
-        with open(res + 'settings/Voice.json', 'r+') as fp:
-            settings = json.load(fp)
-            settings[guild_id]['volume'] = vol
-            json.dump(settings, fp, sort_keys=True, indent=4, separators=(',', ': '))
-        if ctx.voice_client is not None:
-            self.voice_clients[guild_id].set_volume(vol)
+        self.voice_clients[ctx.guild.id].set_volume(vol)
         await ctx.respond(f'Changed volume to {volume}')
 
     @commands.slash_command(help='farts in the current channel or join the channel you are in')
@@ -166,9 +186,9 @@ class Voice(commands.Cog):
         voice_client = self.voice_clients[ctx.guild.id]
         if not voice_client.is_playing:
             source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(res + f'fart/fart{random.randrange(9)}.mp3'))
-            voice_client.play()
             voice_client.voice.play(source, after=lambda e: (print(f'Player error: {e}'), voice_client.pause()) if e
                                     else voice_client.pause())
+            voice_client.play()
             await ctx.delete(delay=0)
 
     @commands.slash_command()
@@ -185,22 +205,19 @@ class Voice(commands.Cog):
             await ctx.respond(f'***{name}*** is {available}')
         return [player, name, bool]
 
-    @commands.slash_command()
+    @commands.slash_command(help='plays the song or adds it to the queue if already playing')
     async def play(self, ctx, url):
         def play_next(error):
-            print(error)
             voice_client = self.voice_clients[ctx.guild.id]
             voice_client.pause()
             if voice_client.is_empty():
-                print('empty')
                 return
             if voice_client.loop:
-                print('loop')
                 player, source = voice_client.head()
             elif voice_client.has_next():
-                print('next')
                 player, source = voice_client.pop2()
             else:
+                voice_client.pop2()
                 print('else')
                 return
 
@@ -215,11 +232,11 @@ class Voice(commands.Cog):
                     else:
                         player = infos[0]
 
-                voice_client.play()
                 voice_client.voice.play(player, after=play_next)
+                voice_client.play()
                 await ctx.send(f'Now playing: ***{player.title}***\nFrom {source}')
             l = asyncio.run_coroutine_threadsafe(play(ctx, player), self.bot.loop)
-            print(l.result(10))
+            print(l.result(0))
 
         if not self.bot.voice_clients:
             ctx = await self.join(ctx, None, message=False)
@@ -249,10 +266,27 @@ class Voice(commands.Cog):
                 await ctx.followup.send(f'Added ***{player.title}*** to the queue')
                 return
             else:
-                voice_client.play()
                 voice_client.voice.play(player, after=play_next)
+                voice_client.play()
                 await ctx.followup.send(f'Now playing: ***{player.title}***\nFrom {source}')
                 return
+
+    @commands.slash_command(help='Plays the song right after')
+    async def playnext(self, ctx, url):
+        voice_client = self.voice_clients[ctx.guild.id]
+
+        if voice_client.is_playing:
+            await ctx.response.defer()
+            infos = await self.info(ctx, url, False)
+            if infos[2]:
+                title, source = infos[1], 'Database'
+                voice_client.add_song_now(title, source)
+            else:
+                title, source = infos[0].title, 'Youtube'
+                voice_client.add_song_now(title, source)
+            await ctx.followup.send(f'Added ***{title}*** to be played next')
+        else:
+            await self.play(ctx, url)
 
     @commands.slash_command(help='stops the music playing')
     async def stop(self, ctx):
@@ -274,13 +308,8 @@ class Voice(commands.Cog):
 
     @commands.slash_command()
     async def loop(self, ctx):
-        if ctx.voice_client is not None:
-            voice_client = self.voice_clients[ctx.guild.id]
-            voice_client.toggle_loop()
-            await ctx.respond('Loop is on' if voice_client.loop else 'Loop is off')
-        else:
-            # TODO change guild settings in json
-            await ctx.respond('Bot must be connected to a voice channel to enable looping')
+        voice_client = self.voice_clients[ctx.guild.id].toggle_loop()
+        await ctx.respond('Loop is on' if voice_client.loop else 'Loop is off')
 
     @commands.slash_command()
     async def next(self, ctx):

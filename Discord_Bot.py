@@ -10,12 +10,11 @@ res = Assets.assets()
 
 # initialise bot
 intents = discord.Intents.all()
-bot = commands.Bot(command_prefix="", intents=intents) # , debug_guilds=[944230321572962314, 501076532975108098])
+bot = commands.Bot(command_prefix="", intents=intents) #, debug_guilds=[944230321572962314, 501076532975108098])
 
 
 @bot.event
 async def on_ready():
-    Voice(bot)
     channel = bot.get_channel(welcome_channel)
     mention = '<@347809940611661825>'
     await channel.send(f'Paré à me faire exploiter {mention}')
@@ -120,13 +119,6 @@ async def on_command_error(ctx, error):
 
 
 def run(which):
-    # Search the token for the right bot to launch
-    with open(res + 'settings/Tokens.json', 'r') as fp:
-        bots = json.load(fp)["Bot"]
-        token = bots[which][0]
-        global welcome_channel
-        welcome_channel = bots[which][1]
-
     bot.load_extension('cogs.Talking')
     bot.load_extension('cogs.Voice')
     bot.load_extension('cogs.MyHelp')
@@ -135,6 +127,13 @@ def run(which):
     bot.load_extension('cogs.GUI')
     bot.load_extension('cogs.ChatBot')
     bot.load_extension('cogs.LoL')
+
+    # Search the token for the right bot to launch
+    with open(res + 'settings/Tokens.json', 'r') as fp:
+        bots = json.load(fp)["Bot"]
+        token = bots[which][0]
+        global welcome_channel
+        welcome_channel = bots[which][1]
 
     bot.run(token)
 
