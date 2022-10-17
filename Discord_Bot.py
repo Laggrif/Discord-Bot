@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 from discord.ext import commands
 
 from MyError import NoError
