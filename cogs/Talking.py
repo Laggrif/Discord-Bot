@@ -41,7 +41,8 @@ class Talking(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             return
 
-    @commands.slash_command(help='Insulte la personne que tu veux. La confidentialité est garantie', aliases=['Insult'])
+    @commands.slash_command(description='Insulte la personne que tu veux. La confidentialité est garantie',
+                            aliases=['Insult'])
     @option('name',
             type=str,
             description='Enter a name/mention/something to insult')
@@ -58,7 +59,8 @@ class Talking(commands.Cog):
         ]
         await ctx.send(insults[random.randrange(len(insults))].format(name))
 
-    @commands.slash_command(help='Envoie un message d\'amour à qui tu veux. La confidentialité est garantie', aliases=['Love'])
+    @commands.slash_command(description='Envoie un message d\'amour à qui tu veux. La confidentialité est garantie',
+                            aliases=['Love'])
     @option('name',
             type=str,
             description='Enter a name/mention/something to love')
@@ -72,8 +74,8 @@ class Talking(commands.Cog):
         ]
         await ctx.send(loves[random.randrange(len(loves))].format(name))
 
-    @commands.slash_command(help='Insère une suggestion pour m\'améliorer et mon magnifique développeur en tiendra '
-                           'peut-etre compte', aliases=['Suggest'])
+    @commands.slash_command(description='Insère une suggestion pour m\'améliorer et mon magnifique développeur en '
+                                        'tiendra peut-etre compte', aliases=['Suggest'])
     @option('suggestion',
             type=str,
             description='Enter a suggestion')

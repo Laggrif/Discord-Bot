@@ -55,14 +55,15 @@ class LoL(commands.Cog):
         self.LoLData.actualise()
 
     @Checks.is_owner()
-    @commands.slash_command(help='Recharge la clé d\'API Riot', aliases=['api'])
+    @commands.slash_command(description='Recharge la clé d\'API Riot', aliases=['api'])
     async def reload_api_key(self, ctx: discord.ApplicationContext):
         self.LoLData.reload_api_key()
         await ctx.respond('Reloaded Riot API key')
 
-    @commands.slash_command(help='Montre l\'historique des X dernières parties de l\'invocateur donné. (par '
+    @commands.slash_command(description='Montre l\'historique des X dernières parties de l\'invocateur donné. (par '
                                  'défaut 5 parties en normal)')
     @option('summoner',
+            type=str,
             description="Enter a summoner name",
             required=False,
             default=None,
@@ -76,7 +77,7 @@ class LoL(commands.Cog):
             defaul=5,
             )
     @option('region',
-            descrition='Enter your region',
+            descrition='Enter a region',
             required=False,
             default=None,
             choices=regions)
@@ -157,9 +158,10 @@ class LoL(commands.Cog):
                 await matches.add(match, msg)
 
     @commands.slash_command(
-        help='Lie votre nom d\'invocateur LoL. Permet de rechercher votre historique de parties sans '
-             'spécifier d\'invocateur', aliases=['link'])
+        description='Lie votre nom d\'invocateur LoL. L\'historique sera disponible sans spécifier d\'invocateur',
+        aliases=['link'])
     @option('summoner',
+            type=str,
             description='Enter your summoner name',
             required=True)
     async def link_account(self, ctx: discord.ApplicationContext, summoner):

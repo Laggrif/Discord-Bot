@@ -39,11 +39,6 @@ async def on_message_edit(before, after):
         await bot.process_commands(after)
 
 
-@bot.event
-async def on_voice_state_updated(ctx, before, after):
-    pass
-
-
 @bot.slash_command(name='reload', description='Reloads specified cog or all cogs if `All`')
 @option('cog',
         autocomplete=lambda ctx: [cog for cog in list(bot.cogs.keys()) + ['All'] if

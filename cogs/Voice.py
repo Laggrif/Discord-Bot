@@ -112,6 +112,22 @@ class Voice(commands.Cog):
             self.voice_clients[guild.id] = VoiceClients(guild.voice_client, guild.id)
 
     @commands.Cog.listener()
+    async def on_voice_state_update(self,
+                                    member: discord.Member,
+                                    before: discord.VoiceState,
+                                    after: discord.VoiceState):
+        voice_state = member.guild.voice_client
+        if voice_state is None:
+            return
+
+        if len(voice_state.channel.members) == 1:
+            await voice_state.disconnect(force=True)
+            self.voice_clients[member.guild.id].\
+                pause().\
+                purge().\
+                voice = None
+
+    @commands.Cog.listener()
     async def on_guild_join(self, guild):
         self.voice_clients[guild.id] = VoiceClients(guild.voice_client, guild.id)
 
@@ -121,7 +137,7 @@ class Voice(commands.Cog):
         self.voice_clients[id].remove()
         del self.voice_clients[id]
 
-    @commands.slash_command(ignore_extra=False, help='Joins the channel you are in', aliases=['Join'])
+    @commands.slash_command(ignore_extra=False, description='Joins the channel you are in', aliases=['Join'])
     @option('channel',
             default=None,
             description='Enter a voice channel',
@@ -150,6 +166,9 @@ class Voice(commands.Cog):
                     if channel == ch.name:
                         channel = ch
                         break
+            if len(channel.members) == 0:
+                await ctx.followup.send('Channel is empty, I don\'t want to be alone...')
+                return
 
         guild_id = ctx.guild.id
         if ctx.voice_client is not None:
