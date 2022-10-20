@@ -16,6 +16,20 @@ API_Key = tokens['LoL']
 url_token = "?api_key=" + API_Key
 
 
+def check_language(language):
+    languages = requests.get('https://ddragon.leagueoflegends.com/cdn/languages.json')
+    if language not in languages.json():
+        print('bad language')
+        return 400
+
+
+def check_version(version):
+    versions = requests.get('https://ddragon.leagueoflegends.com/api/versions.json')
+    if version not in versions.json():
+        print('bad version')
+        return 400
+
+
 class LoLData:
     def __init__(self):
         self.default_language = "en_US"
@@ -64,7 +78,7 @@ class LoLData:
     def get_champ_list(self, version=None, language=None):
         version, language = self.check_version_language(version, language)
 
-        file_name = res + '/champ_list_{}_{}.json'.format(version, language)
+        file_name = res + '/champs_lists/champ_list_{}_{}.json'.format(version, language)
 
         champ_list_json = requests.get(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json".format(version,
@@ -72,26 +86,39 @@ class LoLData:
         with open(file_name, 'w') as fb:
             json.dump(champ_list_json.json(), fb, sort_keys=True, indent=4, separators=(',', ': '))
 
-        tmp_champ_list = []
+        tmp_champ_list = {}
         for champ in champ_list_json.json()['data']:
-            tmp_champ_list.append(champ)
+            tmp_champ_list[champ] = champ_list_json.json()['data'][champ]['name']
         return tmp_champ_list
 
     def get_champ_infos(self, champion, version=None, language=None):
         version, language = self.check_version_language(version, language)
 
-        if champion not in self.champ_list:
-            return 400
+        ch_l = self.get_champ_list(version, language)
+        if champion not in ch_l:
+            if champion not in ch_l.values():
+                return 400
+            else:
+                champion = list(self.champ_list.keys())[list(self.champ_list.values()).index(champion)]
 
-        champ = requests.get("https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion/{}.json"
+        path = res + '/champions/{}/{}/{}.json'.format(version, language, champion)
+        if not os.path.isfile(path):
+            champ = requests.get("https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion/{}.json"
                              .format(version, language, champion) + url_token)
-        Path(res + '/Champions/{}/{}'.format(version, language)).mkdir(parents=True, exist_ok=True)
-        with open(res + '/Champions/{}/{}/{}.json'.format(version, language, champion), 'w') as fb:
-            json.dump(champ.json(), fb, sort_keys=True, indent=4, separators=(',', ': '))
-        return champ.json()
+            if not champ.status_code == 200:
+                print(champ.content)
+                return 400
+            champ = champ.json()
+            Path(res + '/champions/{}/{}'.format(version, language)).mkdir(parents=True, exist_ok=True)
+            with open(path, 'w') as fb:
+                json.dump(champ, fb, sort_keys=True, indent=4, separators=(',', ': '))
+        else:
+            with open(path, 'r') as fb:
+                champ = json.load(fb)
+        return champ
 
     def get_champ_icon(self, champion, version=None):
-        if champion not in self.champ_list:
+        if champion not in self.champ_list.keys():
             return 400
 
         version, language = self.check_version_language(version, None)
@@ -106,13 +133,13 @@ class LoLData:
     def get_all_champs_infos(self, version=None, language=None):
         version, language = self.check_version_language(version, language)
 
-        for champ in self.get_champ_list(version=version, language=language):
+        for champ in self.get_champ_list(version=version, language=language).keys():
             self.get_champ_infos(champ, version, language)
 
     def get_item_list(self, version=None, language=None):
         version, language = self.check_version_language(version, language)
 
-        file_name = res + '/items_list_{}_{}.json'.format(version, language)
+        file_name = res + '/items_lists/items_list_{}_{}.json'.format(version, language)
 
         item_list_json = requests.get(
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/item.json".format(version,
@@ -141,7 +168,7 @@ class LoLData:
     def get_sums_list(self, version=None, language=None):
         version, language = self.check_version_language(version, language)
 
-        file_name = res + '/sums_list_{}_{}.json'.format(version, language)
+        file_name = res + '/sums_lists/sums_list_{}_{}.json'.format(version, language)
 
         sums_list_json = requests.get(
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/summoner.json".format(version,

@@ -1,8 +1,8 @@
 from PIL import Image, ImageDraw, ImageFont
 
 import Assets
-from LoLAPI import LoLData
-from LoLMatch import Match
+from LoL.LoLAPI import LoLData
+from LoL.LoLMatch import Match
 
 res = Assets.assets()
 
@@ -26,7 +26,7 @@ def paste_image(path, coords, size, img, mask=True):
 
 def AMH_picture(match: Match, lolData: LoLData):
 
-    with Image.open(res + 'images/lol/base.png') as img:
+    with Image.open(res + 'images/lol/base_history.png') as img:
         draw = ImageDraw.Draw(img, 'RGBA')
 
         # win
