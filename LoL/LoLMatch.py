@@ -215,9 +215,12 @@ class Match:
 
     def longest_living(self):
         time = self.player_infos['longestTimeSpentLiving']
-        minutes = time / 60
-        seconds = time - minutes * 60
-        return '{}:{:02d}'.format(minutes, seconds)
+        minutes = int(time / 60)
+        seconds = int(time - minutes * 60)
+        return '{}:{}'.format(minutes, seconds)
 
     def time_dead(self):
-        return self.player_infos['totalTimeSpentDead']
+        time = self.player_infos['totalTimeSpentDead']
+        minutes = int(time / 60)
+        seconds = int(time - minutes * 60)
+        return '{}:{}'.format(minutes, seconds)

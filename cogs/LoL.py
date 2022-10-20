@@ -7,10 +7,9 @@ from discord import Interaction, Embed, option
 from discord.ext import commands, tasks
 from discord.ui import Button, View
 
-import AdvancedHistory
-import LoLAPI
 from Assets import assets
-from LoLMatch import Match
+from LoL import AdvancedHistory, LoLAPI
+from LoL.LoLMatch import Match
 from cogs.Checks import Checks
 
 res = assets() + 'League of Legends/'

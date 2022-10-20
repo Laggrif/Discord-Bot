@@ -433,17 +433,23 @@ def AMH_picture(match: Match, lolData: LoLData):
         draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
         heals_ally_text_box = draw.textbbox((x, y), text, font=font)
 
+        # vision score
+        text = 'Vision score'
+        y = heals_ally_text_box[1] + STATS_MARGIN
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        vision_score_text_box = draw.textbbox((x, y), text, font=font)
+
         # time spent dead
         text = 'Time spent dead'
-        y = heals_ally_text_box[1] + STATS_MARGIN
+        y = vision_score_text_box[1] + STATS_MARGIN
         draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
         time_dead_text_box = draw.textbbox((x, y), text, font=font)
 
-        # vision score
-        text = 'Vision score'
+        # max time spent alive
+        text = 'Max time spent alive'
         y = time_dead_text_box[1] + STATS_MARGIN
         draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
-        vision_score_text_box = draw.textbbox((x, y), text, font=font)
+        time_alive_text_box = draw.textbbox((x, y), text, font=font)
 
         #               ----------------- statistics text -----------------------
         # cc done
@@ -467,13 +473,6 @@ def AMH_picture(match: Match, lolData: LoLData):
         draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
         heals_ally_box = draw.textbbox((x, y), text, font=font)
 
-        # time spent dead
-        text = f'{match.time_dead():,d}'.replace(',', ' ')
-        x = utility_box[2] - draw.textlength(text, font)
-        y = time_dead_text_box[1]
-        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
-        time_dead_box = draw.textbbox((x, y), text, font=font)
-
         # vision score
         text = f'{match.vision_score():,d}'.replace(',', ' ')
         x = utility_box[2] - draw.textlength(text, font)
@@ -481,6 +480,19 @@ def AMH_picture(match: Match, lolData: LoLData):
         draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
         vision_score_box = draw.textbbox((x, y), text, font=font)
 
+        # time spent dead
+        text = match.time_dead()
+        x = utility_box[2] - draw.textlength(text, font)
+        y = time_dead_text_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        time_dead_box = draw.textbbox((x, y), text, font=font)
+
+        # max time spent alive
+        text = match.longest_living()
+        x = utility_box[2] - draw.textlength(text, font)
+        y = time_alive_text_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        time_alie_box = draw.textbbox((x, y), text, font=font)
 
         # ----------------------- Items --------------------------------------------------------------------------------
 
