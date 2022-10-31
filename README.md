@@ -15,7 +15,8 @@ Content should be of the type
   "LoL" : "Riot API Key"
 }
 </code></pre>
-To change the default bot, you must edit lines 20-21 of `Discord_Bot.py`
+To change the default bot, you must edit line 147 of `Discord_Bot.py`.
+Finally, you must replace the path in `Assets.py` for the correct path.
 
 
 ### Install required modules
@@ -24,6 +25,7 @@ Use `sudo pip3 install` or `sudo python3 -m pip install` to install the followin
 * [py-cord](https://docs.pycord.dev/en/stable/)
 * [youtube_dl](https://github.com/ytdl-org/youtube-dl)
 * [psutil](https://github.com/giampaolo/psutil)
+* [PyNaCl](https://github.com/pyca/pynacl/)
 * [adafruit-circuitpython-ssd1306](https://github.com/adafruit/Adafruit_CircuitPython_SSD1306)
 * [pillow](https://python-pillow.org/)
 * [requests](https://requests.readthedocs.io/en/latest/)
@@ -34,3 +36,5 @@ In addition, you must install [ffmpeg](https://ffmpeg.org/) to be able to play m
 In a terminal, run `python3 <Path-to-project>/Discord_Bot.py` to run the default bot. To select another one, simply add its name at the end. For example `python3 <Path-to-project>/Discord_Bot.py Test`.
 If you want to use the 128x64 display, you must add `sudo` before.
 
+
+This discord bot was created under Riot Games' "Legal Jibber Jabber" policy using assets owned by Riot Games.  Riot Games does not endorse or sponsor this project.

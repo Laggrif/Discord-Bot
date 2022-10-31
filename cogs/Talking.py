@@ -1,14 +1,15 @@
-import asyncio
 import random
+from pathlib import Path
 
 import discord
-import youtube_dl
-import os
-import sys
+from discord import option
 from discord.ext import commands
+
 from Assets import assets
 
 res = assets()
+
+Path(res + 'suggestions').mkdir(parents=True, exist_ok=True)
 
 
 class Talking(commands.Cog):
@@ -40,8 +41,13 @@ class Talking(commands.Cog):
         if isinstance(error, commands.MissingRequiredArgument):
             return
 
-    @commands.command(help='Insulte la personne que tu veux. La confidentialité est garantie', aliases=['Insult'])
-    async def insult(self, ctx, *strg):
+    @commands.slash_command(description='Insulte la personne que tu veux. La confidentialité est garantie',
+                            aliases=['Insult'])
+    @option('name',
+            type=str,
+            description='Enter a name/mention/something to insult')
+    async def insult(self, ctx: discord.ApplicationContext, name):
+        await ctx.delete(delay=0)
         insults = [
             '{} est un fils de pute.',
             "Va te faire foutre {}.",
@@ -51,30 +57,34 @@ class Talking(commands.Cog):
             "Va te faire retourner par un cheval {}.",
             "{} le suce pute."
         ]
-        await ctx.send(insults[random.randrange(len(insults))].format(" ".join(strg)))
-        await ctx.message.delete()
+        await ctx.send(insults[random.randrange(len(insults))].format(name))
 
-    @commands.command(help='Envoie un message d\'amour à qui tu veux. La confidentialité est garantie', aliases=['Love'])
-    async def love(self, ctx, *strg):
-        msg = ctx.message
-        usr = msg.author
+    @commands.slash_command(description='Envoie un message d\'amour à qui tu veux. La confidentialité est garantie',
+                            aliases=['Love'])
+    @option('name',
+            type=str,
+            description='Enter a name/mention/something to love')
+    async def love(self, ctx: discord.ApplicationContext, name):
+        await ctx.delete(delay=0)
         loves = [
             "Ouah, {0} est si beau!!!",
             "{0} est vraiment la personne la plus incroyable au monde.",
             "{0} est si parfait. A-t-il au moins un défaut!?"
             "C'est un peu embarassant, mais je crois que je t'aime {0}."
         ]
-        await ctx.send(loves[random.randrange(len(loves))].format(" ".join(strg[:]), usr.display_name))
-        await msg.delete()
+        await ctx.send(loves[random.randrange(len(loves))].format(name))
 
-    @commands.command(help='Insère une suggestion pour m\'améliorer et mon magnifique développeur en tiendra '
-                           'peut-etre compte', aliases=['Suggest'])
-    async def suggest(self, ctx, *suggestion):
+    @commands.slash_command(description='Insère une suggestion pour m\'améliorer et mon magnifique développeur en '
+                                        'tiendra peut-etre compte', aliases=['Suggest'])
+    @option('suggestion',
+            type=str,
+            description='Enter a suggestion')
+    async def suggest(self, ctx, suggestion):
         async with ctx.typing():
             f = open(res + '/suggestions/sugg.txt', 'a')
             f.write(' '.join(suggestion) + '\n')
             f.close()
-        await ctx.send('Suggestion prise en compte')
+        await ctx.respond('Suggestion prise en compte')
 
     @commands.Cog.listener()
     async def on_cog_error(self, ctx, error):

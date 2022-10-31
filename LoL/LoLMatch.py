@@ -90,7 +90,31 @@ class Match:
     def first_blood_team(self):
         return self.teams_infos[self.team][OBJECTIVES]['champion']['first']
 
+    def team_turret_kills(self):
+        return self.teams_infos[self.team][OBJECTIVES]['tower']['kills']
+
+    def enemy_turret_kills(self):
+        return self.teams_infos[1 - self.team][OBJECTIVES]['tower']['kills']
+
+    def team_baron_kills(self):
+        return self.teams_infos[self.team][OBJECTIVES]['baron']['kills']
+
+    def enemy_baron_kills(self):
+        return self.teams_infos[1 - self.team][OBJECTIVES]['baron']['kills']
+
     # ------------------- player stats ---------------------
+
+    def items(self):
+        items = []
+        for i in range(7):
+            items.append(str(self.player_infos[f'item{i}']))
+        return items
+
+    def summoners(self):
+        sums = []
+        for i in range(1, 3):
+            sums.append(str(self.player_infos[f'summoner{i}Id']))
+        return sums
 
     def kills(self):
         return self.player_infos['kills']
@@ -107,8 +131,20 @@ class Match:
     def first_blood_player(self):
         return self.player_infos['firstBloodKill']
 
-    def damage_dealt(self):
+    def damage_dealt_champ(self):
         return self.player_infos['totalDamageDealtToChampions']
+
+    def physic_damages_champ(self):
+        return self.player_infos['physicalDamageDealtToChampions']
+
+    def magic_damages_champ(self):
+        return self.player_infos['magicDamageDealtToChampions']
+
+    def true_damages_champ(self):
+        return self.player_infos['trueDamageDealtToChampions']
+
+    def total_damages(self):
+        return self.player_infos['totalDamageDealt']
 
     def damage_to_buildings(self):
         return self.player_infos['damageDealtToBuildings']
@@ -119,6 +155,15 @@ class Match:
     def damage_taken(self):
         return self.player_infos['totalDamageTaken']
 
+    def physic_damage_taken(self):
+        return self.player_infos['physicalDamageTaken']
+
+    def magic_damage_taken(self):
+        return self.player_infos['magicDamageTaken']
+
+    def true_damage_taken(self):
+        return self.player_infos['trueDamageTaken']
+
     def damage_mitigated(self):
         return self.player_infos['damageSelfMitigated']
 
@@ -128,6 +173,9 @@ class Match:
     def heal_others(self):
         return self.player_infos['totalHealsOnTeammates']
 
+    def shield_other(self):
+        return self.player_infos['totalDamageShieldedOnTeammates']
+
     def minions_killed(self):
         return self.player_infos['totalMinionsKilled']
 
@@ -135,7 +183,7 @@ class Match:
         return self.player_infos['visionScore']
 
     def cc_given(self):
-        return self.player_infos['totalTimeCCingOthers']
+        return self.player_infos['timeCCingOthers']
 
     def cc_taken(self):
         """
@@ -145,7 +193,7 @@ class Match:
         return self.player_infos['totalTimeCCDealt']
 
     def level(self):
-        return self.player_infos['championLevel']
+        return self.player_infos['champLevel']
 
     def champion(self):
         return self.player_infos['championName']
@@ -167,6 +215,12 @@ class Match:
 
     def longest_living(self):
         time = self.player_infos['longestTimeSpentLiving']
-        minutes = time / 60
-        seconds = time - minutes * 60
-        return '{}:{:02d}'.format(minutes, seconds)
+        minutes = int(time / 60)
+        seconds = int(time - minutes * 60)
+        return '{}:{}'.format(minutes, seconds)
+
+    def time_dead(self):
+        time = self.player_infos['totalTimeSpentDead']
+        minutes = int(time / 60)
+        seconds = int(time - minutes * 60)
+        return '{}:{}'.format(minutes, seconds)
