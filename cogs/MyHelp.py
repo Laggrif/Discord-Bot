@@ -10,7 +10,7 @@ class MyHelp(commands.HelpCommand):
     async def send_bot_help(self, mapping):
         embed = discord.Embed(title="Help")
         embed.add_field(name='IMPORTANT INFORMATION',
-                        value='Most of the commands moved to slash commands. Simply type ´\´ and discord will show you '
+                        value='Most of the commands moved to slash commands. Simply type ´/´ and discord will show you '
                               'available commands',
                         inline=False)
         for cog, commands in mapping.items():
