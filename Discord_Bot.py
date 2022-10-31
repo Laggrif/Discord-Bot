@@ -10,6 +10,7 @@ from cogs.Voice import *
 # folder to search for res
 res = Assets.assets()
 
+
 # initialise bot
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="", intents=intents) #, debug_guilds=[944230321572962314, 501076532975108098])
@@ -106,15 +107,6 @@ async def on_command_error(ctx, error):
         await on_application_command_error(ctx, error)
 
 
-"""async def start_bot():
-    await bot.load_extension('Talking')
-    await bot.load_extension('Voice')
-    await bot.load_extension('MyHelp')
-    # bot.load_extension('Display')
-    await bot.load_extension('Checks')
-    await bot.load_extension('GUI')"""
-
-
 def run(which):
     bot.load_extension('cogs.Talking')
     bot.load_extension('cogs.Voice')
@@ -124,6 +116,7 @@ def run(which):
     bot.load_extension('cogs.GUI')
     bot.load_extension('cogs.ChatBot')
     bot.load_extension('cogs.LoL')
+    bot.load_extension('cogs.API')
 
     # Search the token for the right bot to launch
     with open(res + 'settings/Tokens.json', 'r') as fp:

@@ -1,22 +1,25 @@
-from LoL import LoLAPI
 from LoL.LoLAPI import LoLData
 
 
 class Champ:
-    def __new__(cls, champion, version=None, language=None):
-        if LoLAPI.check_language(language) == 400 or LoLAPI.check_version(version) == 400:
+    def __new__(cls, lolData, champion, version=None, language=None):
+        if lolData.check_language(language) == 400 \
+                or lolData.check_version(version) == 400\
+                or lolData.check_champion(champion, version) == 400:
             del cls
             print('no')
             return None
-
         return super().__new__(cls)
 
-    def __init__(self, champion: str, version=None, language=None):
-        self.lolData = LoLData()
+    def __init__(self, lolData: LoLData, champion: str, version=None, language=None):
+        self.lolData = lolData
         self.champion = champion
         self.version = self.lolData.current_ddragon_version if version is None else version
-        self.language = language
+        self.language = self.lolData.default_language if language is None else language
         self.champ = self.lolData.get_champ_infos(champion, version, language)
+        if self.champ == 400:
+            del self
+            return
         self.champ_data = self.champ['data'][champion]
 
     def champ_name(self):
@@ -36,5 +39,11 @@ class Champ:
 
     def enemy_tips(self):
         return self.champ_data['enemytips']
+
+    def champ_skins(self):
+        tmp = {}
+        for skin in self.champ_data['skins']:
+            tmp[skin['num']] = skin['name']
+        return tmp
 
 

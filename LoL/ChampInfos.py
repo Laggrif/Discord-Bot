@@ -1,16 +1,26 @@
 from PIL import Image, ImageDraw, ImageFont
 
 import Assets
+from ColorAverage import *
 from LoL.LoLAPI import LoLData
 from LoL.LoLChamp import Champ
 
 data = Assets.assets() + 'League of Legends/Data/'
 images = Assets.assets() + 'images/lol/'
 
-FONT = Assets.assets() + 'fonts/Friz Quadrata Std Medium.otf'
+FONT60 = ImageFont.truetype(Assets.assets() + 'fonts/Friz Quadrata Std Medium.otf', 60)
+FONT40 = FONT60.font_variant(size=40)
+FONT100 = FONT60.font_variant(size=100)
 
-WIDTH = 1080
-HEIGHT = 1920
+WIDTH = 2120
+HEIGHT = 3769
+
+XS_MARGIN = 10
+S_MARGIN = 20
+M_MARGIN = 40
+L_MARGIN = 60
+XL_MARGIN = 80
+XXL_MARGIN = 160
 
 
 def paste_image(path, coords, size, img, mask=True):
@@ -19,15 +29,92 @@ def paste_image(path, coords, size, img, mask=True):
         img.paste(icon, coords, mask=icon if mask else None)
 
 
-def ChI(lolData: LoLData, champ: Champ):
+def break_text(text: str, font, draw: ImageDraw.ImageDraw, max_width):
+    words = text.split(' ')
+    new_text = ''
+    tmp = ''
+    for word in words:
+        word = ' ' + word
+        tmp += word
+        if draw.textlength(tmp, font) > max_width:
+            tmp = tmp.removesuffix(word)
+            new_text += tmp
+            new_text += '\n'
+            tmp = word.removeprefix(' ')
+    new_text += tmp
+    return new_text
+
+
+def ChI_image(lolData: LoLData, champ: Champ):
+    global HEIGHT
+    version = champ.version
+    language = champ.language
+    champion = champ.champion
+
     with Image.open(images + 'base_champ.png') as img:
         draw = ImageDraw.Draw(img, 'RGBA')
 
-        draw.rectangle((0, 0, WIDTH - 1, HEIGHT - 1), fill=(255, 0, 0, 255), outline=(255, 255, 255, 255))
+        lolData.get_champ_icon(champion, version)
+        champ_icon_path = images + f'Champions_icons/{version}/{champion}.png'
 
-        draw.text((5, 5), champ.champ_title(), font=ImageFont.truetype(FONT, 30))
+        lolData.get_champ_splashart(champion, version)
+        champ_splashart_path = images + f'Champions_splasharts/{version}/{champion}/0.png'
 
-        lolData.get_champ_icon(champ.champion, champ.version)
-        paste_image(images + f'Champions_icons/{champ.version}/{champ.champion}.png', (400, 400), (300, 300), img, mask=False)
+        bg = mix_color(champ_icon_path)
+        draw.rectangle((0, 0, WIDTH - 1, HEIGHT - 1), fill=bg, outline=bg)
 
-        img.show()
+        # -------------------- champion square icon ---------------------
+        width = 300
+        height = 300
+        paste_image(champ_icon_path,
+                    (WIDTH - XS_MARGIN - width, XS_MARGIN),
+                    (width, height),
+                    img,
+                    mask=False)
+        champ_icon_box = [WIDTH - XS_MARGIN - width, XS_MARGIN, WIDTH - XS_MARGIN, XS_MARGIN + height]
+
+        # -------------------- champ name and title ---------------------
+        txt = champion + ' ' + champ.champ_title()
+        draw.text((S_MARGIN, S_MARGIN), txt, font=FONT60)
+        champ_name_box = draw.textbbox((S_MARGIN, S_MARGIN), txt, font=FONT60)
+
+        # -------------------- lore ---------------------
+        txt = break_text(champ.champ_lore(), FONT40, draw, WIDTH - 2 * L_MARGIN)
+        coords = (L_MARGIN, champ_icon_box[3] + XL_MARGIN)
+        lore_text_box = draw.multiline_textbbox(coords, txt, font=FONT40)
+        draw.rectangle((lore_text_box[0] - M_MARGIN, lore_text_box[1] - M_MARGIN, lore_text_box[2] + M_MARGIN, lore_text_box[3] + M_MARGIN),
+                       fill=(bg[0] - 10, bg[1] - 10, bg[2] - 10),
+                       outline=(bg[0] + 20, bg[1] + 20, bg[2] + 20))
+        draw.multiline_text(coords, txt, font=FONT40, spacing=XS_MARGIN)
+
+        # -------------------- base stats ---------------------
+
+        # -------------------- abilities ---------------------
+
+        # -------------------- skins ---------------------------------
+        ratio = 308.0 / 560.0
+        skins = champ.champ_skins()
+        ids = list(skins.keys())
+        names = list(skins.values())
+        num = len(skins)
+        max_per_row = 7
+        wi = WIDTH / max_per_row
+        he = wi / ratio
+
+        new_height = int(HEIGHT + int(num / max_per_row) * (he + 80))
+        img = img.crop((0, 0, WIDTH, new_height))
+        draw = ImageDraw.Draw(img, 'RGBA')
+        draw.rectangle((0, HEIGHT, WIDTH, new_height), fill=bg, outline=bg)
+        for i in range(num):
+            id = ids[i]
+            text = names[i].strip(champ.champ_name())
+            draw.text((int(wi * (i % max_per_row) + (wi - draw.textlength(text, FONT40)) / 2.0), int(HEIGHT - he - 60.0 - 20.0 * (-1) ** i + (he + 80.0 + M_MARGIN) * int(i / max_per_row))), text, font=FONT40)
+            lolData.get_champ_loading(champion, version, id)
+            paste_image(images + f'Champions_loading/{version}/{champion}/{id}.png',
+                        (int(wi * (i % max_per_row)), int(HEIGHT - he + (he + 80.0 + M_MARGIN) * int(i / max_per_row))),
+                        (int(wi), int(wi / ratio)),
+                        img,
+                        False)
+        HEIGHT = new_height
+
+        return img

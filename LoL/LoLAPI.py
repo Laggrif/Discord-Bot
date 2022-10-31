@@ -17,6 +17,8 @@ url_token = "?api_key=" + API_Key
 
 
 def check_language(language):
+    if language is None:
+        return
     languages = requests.get('https://ddragon.leagueoflegends.com/cdn/languages.json')
     if language not in languages.json():
         print('bad language')
@@ -24,6 +26,8 @@ def check_language(language):
 
 
 def check_version(version):
+    if version is None:
+        return
     versions = requests.get('https://ddragon.leagueoflegends.com/api/versions.json')
     if version not in versions.json():
         print('bad version')
@@ -32,6 +36,7 @@ def check_version(version):
 
 class LoLData:
     def __init__(self):
+        self.languages = requests.get('https://ddragon.leagueoflegends.com/cdn/languages.json').json()
         self.default_language = "en_US"
         self.default_region = 'euw1'
         self.ddragon_versions = requests.get("https://ddragon.leagueoflegends.com/api/versions.json" + url_token)
@@ -49,7 +54,31 @@ class LoLData:
             language = self.default_language
         return version, language
 
-    def reload_api_key(self):
+    def check_language(self, language):
+        if language is None:
+            return
+        if language not in self.languages:
+            print('bad language')
+            return 400
+
+    def check_version(self, version):
+        if version is None:
+            return
+        if version not in self.ddragon_versions_json:
+            print('bad version')
+            return 400
+
+    def check_champion(self, champion, version):
+        ch_l = self.get_champ_list(version)
+        if champion not in ch_l:
+            if champion not in ch_l.values():
+                return 400
+            else:
+                return list(ch_l.keys())[list(ch_l.values()).index(champion)]
+        return champion
+
+    @staticmethod
+    def reload_api_key():
         with open(assets() + 'settings/Tokens.json', 'r') as fp:
             tokens = json.load(fp)
         global API_Key
@@ -68,15 +97,16 @@ class LoLData:
             self.queues = self.get_queues()
             self.get_all_champs_infos()
 
-    def get_queues(self):
+    @staticmethod
+    def get_queues():
         queues = requests.get('https://static.developer.riotgames.com/docs/lol/queues.json')
         with open(res + '/queues.json', 'w') as fp:
             json.dump(queues.json(), fp, indent=4, separators=(',', ': '))
 
         return queues.json()
 
-    def get_champ_list(self, version=None, language=None):
-        version, language = self.check_version_language(version, language)
+    def get_champ_list(self, version=None):
+        version, language = self.check_version_language(version, None)
 
         file_name = res + '/champs_lists/champ_list_{}_{}.json'.format(version, language)
 
@@ -94,17 +124,12 @@ class LoLData:
     def get_champ_infos(self, champion, version=None, language=None):
         version, language = self.check_version_language(version, language)
 
-        ch_l = self.get_champ_list(version, language)
-        if champion not in ch_l:
-            if champion not in ch_l.values():
-                return 400
-            else:
-                champion = list(self.champ_list.keys())[list(self.champ_list.values()).index(champion)]
+        champion = self.check_champion(champion, version)
 
         path = res + '/champions/{}/{}/{}.json'.format(version, language, champion)
         if not os.path.isfile(path):
             champ = requests.get("https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion/{}.json"
-                             .format(version, language, champion) + url_token)
+                                 .format(version, language, champion) + url_token)
             if not champ.status_code == 200:
                 print(champ.content)
                 return 400
@@ -130,10 +155,32 @@ class LoLData:
             with open(assets() + 'images/lol/Champions_icons/{}/{}.png'.format(version, champion), 'wb') as fb:
                 fb.write(image)
 
+    def get_champ_splashart(self, champion, version=None, skin_id=0):
+        champion = self.check_champion(champion, version)
+        path = assets() + f'images/lol/Champions_splasharts/{version}/{champion}/'
+
+        if not os.path.isfile(path + f'{skin_id}.png'):
+            image = requests.get(f'http://ddragon.leagueoflegends.com/cdn/img/champion/splash/{champion}_{skin_id}.jpg')\
+                .content
+            Path(path).mkdir(parents=True, exist_ok=True)
+            with open(path + f'{skin_id}.png', 'wb') as fb:
+                fb.write(image)
+
+    def get_champ_loading(self, champion, version=None, skin_id=0):
+        champion = self.check_champion(champion, version)
+        path = assets() + f'images/lol/Champions_loading/{version}/{champion}/'
+
+        if not os.path.isfile(path + f'{skin_id}.png'):
+            image = requests.\
+                get(f'http://ddragon.leagueoflegends.com/cdn/img/champion/loading/{champion}_{skin_id}.jpg').content
+            Path(path).mkdir(parents=True, exist_ok=True)
+            with open(path + f'{skin_id}.png', 'wb') as fb:
+                fb.write(image)
+
     def get_all_champs_infos(self, version=None, language=None):
         version, language = self.check_version_language(version, language)
 
-        for champ in self.get_champ_list(version=version, language=language).keys():
+        for champ in self.get_champ_list(version=version).keys():
             self.get_champ_infos(champ, version, language)
 
     def get_item_list(self, version=None, language=None):
@@ -143,7 +190,7 @@ class LoLData:
 
         item_list_json = requests.get(
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/item.json".format(version,
-                                                                                      language) + url_token)
+                                                                                 language) + url_token)
         with open(file_name, 'w') as fb:
             json.dump(item_list_json.json(), fb, sort_keys=True, indent=4, separators=(',', ': '))
 
@@ -172,7 +219,7 @@ class LoLData:
 
         sums_list_json = requests.get(
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/summoner.json".format(version,
-                                                                                      language) + url_token)
+                                                                                     language) + url_token)
         with open(file_name, 'w') as fb:
             json.dump(sums_list_json.json(), fb, sort_keys=True, indent=4, separators=(',', ': '))
 
@@ -190,7 +237,7 @@ class LoLData:
         if not os.path.isfile(assets() + 'images/lol/Summoner_spells_icons/{}/{}.png'.format(version, sum_id)):
             image = requests.get(
                 'https://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}.png'
-                .format(version, self.sums_list[sum_id]))\
+                .format(version, self.sums_list[sum_id])) \
                 .content
             Path(assets() + 'images/lol/Summoner_spells_icons/{}'.format(version)).mkdir(parents=True, exist_ok=True)
             with open(assets() + 'images/lol/Summoner_spells_icons/{}/{}.png'.format(version, sum_id), 'wb') as fb:
@@ -229,7 +276,8 @@ class LoLData:
             return 400
         return summoner.json()['puuid']
 
-    def get_match_history(self, summoner_uuid, games_count=None):
+    @staticmethod
+    def get_match_history(summoner_uuid, games_count=None):
         if games_count is None:
             games_count = 5
 
@@ -245,7 +293,6 @@ class LoLData:
                 'https://europe.api.riotgames.com/lol/match/v5/matches/{}'.format(matchId) + url_token)
             match_list.append(match_infos.json())
         return 200, match_list
-
 
 
 """
