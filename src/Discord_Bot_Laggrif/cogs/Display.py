@@ -1,13 +1,13 @@
 import textwrap
 
-from discord.ext import commands, tasks
+from discord.ext import tasks
 
-from cogs.Checks import *
+from Discord_Bot_Laggrif.cogs.Checks import *
 
 # For OLED display support
 try:
-    from Stats import stats
-    from Clock import clock
+    from Discord_Bot_Laggrif.Stats import stats
+    from Discord_Bot_Laggrif.Clock import clock
 
     import board
 except Exception as e:
@@ -16,7 +16,7 @@ import adafruit_ssd1306
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
-from Assets import assets
+from Discord_Bot_Laggrif.Assets import assets
 
 res = assets()
 timer = 0

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import requests
 
-from Assets import assets
+from Discord_Bot_Laggrif.Assets import assets
 
 res = assets() + 'League of Legends/Data'
 

@@ -107,6 +107,10 @@ async def on_command_error(ctx, error):
         await on_application_command_error(ctx, error)
 
 
+def get_bot():
+    return bot
+
+
 def run(which):
     bot.load_extension('cogs.Talking')
     bot.load_extension('cogs.Voice')

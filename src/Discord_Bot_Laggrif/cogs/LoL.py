@@ -7,10 +7,10 @@ from discord import Interaction, Embed, option
 from discord.ext import commands, tasks
 from discord.ui import Button, View
 
-from Assets import assets
+from Discord_Bot_Laggrif.Assets import assets
+from Discord_Bot_Laggrif.LoL.LoLMatch import Match
+from Discord_Bot_Laggrif.cogs.Checks import Checks
 from LoL import AdvancedHistory, LoLAPI
-from LoL.LoLMatch import Match
-from cogs.Checks import Checks
 
 res = assets() + 'League of Legends/'
 

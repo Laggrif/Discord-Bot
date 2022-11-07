@@ -1,8 +1,8 @@
 from PIL import Image, ImageDraw, ImageFont
 
-import Assets
-from LoL.LoLAPI import LoLData
-from LoL.LoLMatch import Match
+from Discord_Bot_Laggrif import Assets
+from Discord_Bot_Laggrif.LoL.LoLAPI import LoLData
+from Discord_Bot_Laggrif.LoL.LoLMatch import Match
 
 res = Assets.assets()
 

@@ -20,16 +20,14 @@
 # THE SOFTWARE.
 from __future__ import division
 
-import board
-import psutil
+from subprocess import PIPE, Popen
 
 import adafruit_ssd1306
-
+import board
+import psutil
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
-
-from subprocess import PIPE, Popen
 
 # 128x32 display with hardware I2C:
 disp = adafruit_ssd1306.SSD1306_I2C(width=128, height=64, i2c=board.I2C())

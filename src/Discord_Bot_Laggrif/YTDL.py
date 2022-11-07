@@ -1,11 +1,8 @@
 import asyncio
-import random
 
 import discord
 import youtube_dl
-import os
-import sys
-from discord.ext import commands
+
 from Assets import assets
 
 assets = assets()

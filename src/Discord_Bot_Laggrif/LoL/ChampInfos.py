@@ -1,9 +1,9 @@
 from PIL import Image, ImageDraw, ImageFont
 
-import Assets
-from ColorAverage import *
-from LoL.LoLAPI import LoLData
-from LoL.LoLChamp import Champ
+from Discord_Bot_Laggrif import Assets
+from Discord_Bot_Laggrif.ColorAverage import *
+from Discord_Bot_Laggrif.LoL.LoLAPI import LoLData
+from Discord_Bot_Laggrif.LoL.LoLChamp import Champ
 
 data = Assets.assets() + 'League of Legends/Data/'
 images = Assets.assets() + 'images/lol/'

@@ -5,7 +5,7 @@ import discord
 from discord import option
 from discord.ext import commands
 
-from Assets import assets
+from Discord_Bot_Laggrif.Assets import assets
 
 res = assets()
 

@@ -1,13 +1,12 @@
 import time
+from datetime import datetime
 
 import adafruit_ssd1306
 import board
-
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 
-from datetime import datetime
 from Assets import assets
 
 res = assets()
