@@ -1,5 +1,3 @@
-import asyncio
-import discord
 from discord.ext import commands
 
 owners = [347809940611661825]
