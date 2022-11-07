@@ -3,9 +3,9 @@ import asyncio
 import discord
 import youtube_dl
 
-from Assets import assets
+from Discord_Bot_Laggrif.Assets import res_folder
 
-assets = assets()
+assets = res_folder()
 
 youtube_dl.utils.bug_reports_message = lambda: ''
 ytdl_format_options = {
@@ -35,7 +35,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         self.title = data.get('title')
         self.url = data.get('url')
-        self.formated_filename = ytdl.prepare_filename(data).replace(assets + '/downloads/', '')
+        self.formated_filename = ytdl.prepare_filename(data).replace(res_folder + '/downloads/', '')
 
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):

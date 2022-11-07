@@ -1,12 +1,12 @@
 import json
+import os
 
 from discord import ApplicationContext, option
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, Cog, slash_command
 
-from Discord_Bot_Laggrif import Assets
 from Discord_Bot_Laggrif.YTDL import *
 
-res = Assets.assets()
+res = res_folder()
 
 
 class VoiceClients:
@@ -100,18 +100,18 @@ class VoiceClients:
             json.dump(settings, fp, indent=4, separators=(',', ': '))
 
 
-class Voice(commands.Cog):
+class Voice(Cog):
 
     def __init__(self, bot: Bot):
         self.bot = bot
         self.voice_clients = dict()
 
-    @commands.Cog.listener()
+    @Cog.listener()
     async def on_ready(self):
         for guild in self.bot.guilds:
             self.voice_clients[guild.id] = VoiceClients(guild.voice_client, guild.id)
 
-    @commands.Cog.listener()
+    @Cog.listener()
     async def on_voice_state_update(self,
                                     member: discord.Member,
                                     before: discord.VoiceState,
@@ -127,17 +127,17 @@ class Voice(commands.Cog):
                 purge().\
                 voice = None
 
-    @commands.Cog.listener()
+    @Cog.listener()
     async def on_guild_join(self, guild):
         self.voice_clients[guild.id] = VoiceClients(guild.voice_client, guild.id)
 
-    @commands.Cog.listener()
+    @Cog.listener()
     async def on_guild_remove(self, guild):
         id = guild.id
         self.voice_clients[id].remove()
         del self.voice_clients[id]
 
-    @commands.slash_command(ignore_extra=False, description='Joins the channel you are in', aliases=['Join'])
+    @slash_command(ignore_extra=False, description='Joins the channel you are in', aliases=['Join'])
     @option('channel',
             default=None,
             description='Enter a voice channel',
@@ -182,20 +182,20 @@ class Voice(commands.Cog):
             return None
         return ctx
 
-    @commands.slash_command(help='Leaves all channels')
+    @slash_command(help='Leaves all channels')
     async def leave(self, ctx: ApplicationContext):
         if ctx.voice_client is not None:
             await ctx.voice_client.disconnect(force=True)
             self.voice_clients.pop(ctx.guild.id)
         await ctx.respond('Left voice channel')
 
-    @commands.slash_command()
+    @slash_command()
     async def volume(self, ctx, volume):
         vol = float(volume) / 100.0
         self.voice_clients[ctx.guild.id].set_volume(vol)
         await ctx.respond(f'Changed volume to {volume}')
 
-    @commands.slash_command(help='farts in the current channel or join the channel you are in')
+    @slash_command(help='farts in the current channel or join the channel you are in')
     async def fart(self, ctx):
         if not self.bot.voice_clients:
             ctx = await self.join(ctx, None, False)
@@ -210,7 +210,7 @@ class Voice(commands.Cog):
             voice_client.play()
             await ctx.delete(delay=0)
 
-    @commands.slash_command()
+    @slash_command()
     async def info(self, ctx, url, message=True):
         async with ctx.typing():
             player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
@@ -224,7 +224,7 @@ class Voice(commands.Cog):
             await ctx.respond(f'***{name}*** is {available}')
         return [player, name, bool]
 
-    @commands.slash_command(help='plays the song or adds it to the queue if already playing')
+    @slash_command(help='plays the song or adds it to the queue if already playing')
     async def play(self, ctx, url):
         def play_next(error):
             voice_client = self.voice_clients[ctx.guild.id]
@@ -290,7 +290,7 @@ class Voice(commands.Cog):
                 await ctx.followup.send(f'Now playing: ***{player.title}***\nFrom {source}')
                 return
 
-    @commands.slash_command(help='Plays the song right after')
+    @slash_command(help='Plays the song right after')
     async def playnext(self, ctx, url):
         voice_client = self.voice_clients[ctx.guild.id]
 
@@ -307,30 +307,30 @@ class Voice(commands.Cog):
         else:
             await self.play(ctx, url)
 
-    @commands.slash_command(help='stops the music playing')
+    @slash_command(help='stops the music playing')
     async def stop(self, ctx):
         ctx.voice_client.stop()
         self.voice_clients[ctx.guild.id].pause().purge()
         await ctx.respond('Stopped voice and purged queue')
 
-    @commands.slash_command()
+    @slash_command()
     async def pause(self, ctx):
         self.voice_clients[ctx.guild.id].pause().\
             voice().pause()
         await ctx.respond('Paused voice')
 
-    @commands.slash_command()
+    @slash_command()
     async def resume(self, ctx):
         self.voice_clients[ctx.guild.id].play().\
             voice().resume()
         await ctx.respond('Resuming')
 
-    @commands.slash_command()
+    @slash_command()
     async def loop(self, ctx):
         voice_client = self.voice_clients[ctx.guild.id].toggle_loop()
         await ctx.respond('Loop is on' if voice_client.loop else 'Loop is off')
 
-    @commands.slash_command()
+    @slash_command()
     async def next(self, ctx):
         await ctx.response.defer()
         voice_client = self.voice_clients[ctx.guild.id]
@@ -342,7 +342,7 @@ class Voice(commands.Cog):
         if change:
             voice_client.toggle_loop()
 
-    @commands.slash_command()
+    @slash_command()
     async def queue(self, ctx):
         voice_client = self.voice_clients[ctx.guild.id]
         if voice_client.is_empty():
@@ -355,7 +355,7 @@ class Voice(commands.Cog):
                                 inline=False)
             await ctx.respond(embed=embed)
 
-    @commands.slash_command()
+    @slash_command()
     async def download(self, ctx, *, url):
         async with ctx.typing():
             await ctx.respond('Downloading...')
@@ -363,7 +363,7 @@ class Voice(commands.Cog):
             await ctx.send('Download finished')
         return player
 
-    @commands.slash_command(aliases=['dataBase', 'data', 'Data'])
+    @slash_command(aliases=['dataBase', 'data', 'Data'])
     async def database(self, ctx):
         dir = res + 'downloads/'
         if not os.path.exists(dir):
@@ -377,7 +377,7 @@ class Voice(commands.Cog):
                 embed.add_field(name=f, value=file_size, inline=False)
         await ctx.channel.send(embed=embed)
 
-    @commands.slash_command()
+    @slash_command()
     async def sendfile(self, ctx, *, file):
         async with ctx.typing():
             if not os.path.isfile(res + f'downloads/{file}'):
@@ -388,7 +388,7 @@ class Voice(commands.Cog):
         except:
             await ctx.respond('Sorry, the selected file is too big')
 
-    @commands.Cog.listener()
+    @Cog.listener()
     async def on_cog_error(self, ctx, error):
         if isinstance(error, commands.CommandNotFound):
             return

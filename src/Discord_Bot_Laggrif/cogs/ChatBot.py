@@ -9,9 +9,9 @@ from discord.ext import commands, tasks
 from discord.ext.commands import Context
 from discord.ui import Button, View
 
-from Discord_Bot_Laggrif.Assets import assets
+from Discord_Bot_Laggrif.Assets import res_folder
 
-res = assets()
+res = res_folder()
 
 API_URL = 'https://api-inference.huggingface.co/models/Laggrif/'
 MODEL_NAME = 'DialoGPT-medium-Luke'

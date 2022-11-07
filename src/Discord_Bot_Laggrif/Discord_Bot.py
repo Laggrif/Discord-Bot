@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
+import sys
 
 from discord.ext import commands
 
-from MyError import NoError
-from cogs.Checks import *
-from cogs.Display import Display
-from cogs.Voice import *
+from Discord_Bot_Laggrif.MyError import NoError
+from Discord_Bot_Laggrif.cogs.Checks import *
+from Discord_Bot_Laggrif.cogs.Display import Display
+from Discord_Bot_Laggrif.cogs.Voice import *
 
 # folder to search for res
-res = Assets.assets()
+res = res_folder()
 
 
 # initialise bot
@@ -112,15 +113,7 @@ def get_bot():
 
 
 def run(which):
-    bot.load_extension('cogs.Talking')
-    bot.load_extension('cogs.Voice')
-    bot.load_extension('cogs.MyHelp')
-    bot.load_extension('cogs.Display')
-    bot.load_extension('cogs.Checks')
-    bot.load_extension('cogs.GUI')
-    bot.load_extension('cogs.ChatBot')
-    bot.load_extension('cogs.LoL')
-    bot.load_extension('cogs.API')
+    bot.load_extension('cogs', package='.')
 
     # Search the token for the right bot to launch
     with open(res + 'settings/Tokens.json', 'r') as fp:

@@ -1,7 +1,12 @@
 import textwrap
 
+import adafruit_ssd1306
+from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
 from discord.ext import tasks
 
+from Discord_Bot_Laggrif.Assets import res_folder
 from Discord_Bot_Laggrif.cogs.Checks import *
 
 # For OLED display support
@@ -12,13 +17,9 @@ try:
     import board
 except Exception as e:
     print("Board is not recognised or display is not connected")
-import adafruit_ssd1306
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
-from Discord_Bot_Laggrif.Assets import assets
 
-res = assets()
+
+res = res_folder()
 timer = 0
 
 stats_cnt = 0

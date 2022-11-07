@@ -5,9 +5,9 @@ import discord
 from discord import option
 from discord.ext import commands
 
-from Discord_Bot_Laggrif.Assets import assets
+from Discord_Bot_Laggrif.Assets import res_folder
 
-res = assets()
+res = res_folder()
 
 Path(res + 'suggestions').mkdir(parents=True, exist_ok=True)
 

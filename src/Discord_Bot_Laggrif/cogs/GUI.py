@@ -1,9 +1,9 @@
 from discord.ui import Button, View
 
-from Discord_Bot_Laggrif.Assets import assets
+from Discord_Bot_Laggrif.Assets import res_folder
 from Discord_Bot_Laggrif.cogs.MyHelp import *
 
-res = assets()
+res = res_folder()
 
 
 class GUI(commands.Cog):

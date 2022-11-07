@@ -1,10 +1,10 @@
 from PIL import Image, ImageDraw, ImageFont
 
-from Discord_Bot_Laggrif import Assets
+from Discord_Bot_Laggrif.Assets import res_folder
 from Discord_Bot_Laggrif.LoL.LoLAPI import LoLData
 from Discord_Bot_Laggrif.LoL.LoLMatch import Match
 
-res = Assets.assets()
+res = res_folder()
 
 FONT = res + 'fonts/Friz Quadrata Std Medium.otf'
 
