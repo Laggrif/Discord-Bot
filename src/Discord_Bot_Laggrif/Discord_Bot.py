@@ -29,7 +29,7 @@ async def on_ready():
 @bot.event
 async def on_message(msg):
     if 'salut' in msg.content.lower():
-        await msg.add_reaction('a:Salut:915623038140158063')
+        await msg.add_reaction('<a:salut:1039458860395667536>')
     await bot.process_commands(msg)
 
 
@@ -37,7 +37,7 @@ async def on_message(msg):
 async def on_message_edit(before, after):
     if before.content != after.content:
         if 'salut' in after.content.lower():
-            await after.add_reaction('a:Salut:915623038140158063')
+            await after.add_reaction('<a:salut:1039458860395667536>')
         await bot.process_commands(after)
 
 
@@ -113,7 +113,9 @@ def get_bot():
 
 
 def run(which):
-    bot.load_extension('cogs', package='.')
+    dir = os.path.dirname(os.path.realpath(__file__))
+    for filename in os.listdir(dir + '/cogs'):
+        bot.load_extension(f'.{filename.removesuffix(".py")}', package='Discord_Bot_Laggrif.cogs')
 
     # Search the token for the right bot to launch
     with open(res + 'settings/Tokens.json', 'r') as fp:

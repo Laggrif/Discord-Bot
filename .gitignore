@@ -1,7 +1,7 @@
-/res/League of Legends/
-/res/settings/
-/res/suggestions/
-/res/downloads/
+/src/Discord_Bot_Laggrif/res/League of Legends/
+/src/Discord_Bot_Laggrif/res/settings/
+/src/Discord_Bot_Laggrif/res/suggestions/
+/src/Discord_Bot_Laggrif/res/downloads/
 /venv/
 /Tests.py
 /venvAnaconda/
