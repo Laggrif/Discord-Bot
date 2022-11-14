@@ -1,16 +1,18 @@
 import asyncio
+import audioop
 
 import discord
 import youtube_dl
+from discord import ClientException, AudioSource
 
 from Discord_Bot_Laggrif.Assets import res_folder
 
-assets = res_folder()
+res = res_folder()
 
 youtube_dl.utils.bug_reports_message = lambda: ''
 ytdl_format_options = {
     'format': 'bestaudio/best',
-    'outtmpl': assets + '/downloads/%(title)s.%(ext)s',
+    'outtmpl': res + '/downloads/%(title)s.%(ext)s',
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,
@@ -35,7 +37,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         self.title = data.get('title')
         self.url = data.get('url')
-        self.formated_filename = ytdl.prepare_filename(data).replace(res_folder + '/downloads/', '')
+        self.formated_filename = ytdl.prepare_filename(data).replace(res + '/downloads/', '')
 
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):
