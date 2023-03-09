@@ -93,6 +93,7 @@ async def on_application_command_error(ctx, error):
         return
 
     else:
+        print(error)
         await ctx.send('Something went wrong...')
         raise error
 

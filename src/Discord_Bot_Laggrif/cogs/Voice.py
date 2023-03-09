@@ -2,6 +2,7 @@ import json
 import os
 
 from discord import ApplicationContext, option
+from discord.ext import commands
 from discord.ext.commands import Bot, Cog, slash_command
 
 from Discord_Bot_Laggrif.YTDL import *
@@ -237,11 +238,9 @@ class Voice(Cog):
                 player, source = voice_client.pop2()
             else:
                 voice_client.pop2()
-                print('else')
                 return
 
             async def play(ctx, player):
-                print('t')
                 if os.path.isfile(res + f'downloads/{player}'):
                     player = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(res + f'downloads/{player}'))
                 else:
@@ -316,13 +315,13 @@ class Voice(Cog):
     @slash_command()
     async def pause(self, ctx):
         self.voice_clients[ctx.guild.id].pause().\
-            voice().pause()
+            voice.pause()
         await ctx.respond('Paused voice')
 
     @slash_command()
     async def resume(self, ctx):
         self.voice_clients[ctx.guild.id].play().\
-            voice().resume()
+            voice.resume()
         await ctx.respond('Resuming')
 
     @slash_command()

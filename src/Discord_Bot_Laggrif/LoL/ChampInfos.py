@@ -1,5 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 
+from Discord_Bot_Laggrif import Assets
 from Discord_Bot_Laggrif.Assets import res_folder
 from Discord_Bot_Laggrif.ColorAverage import *
 from Discord_Bot_Laggrif.LoL.LoLAPI import LoLData

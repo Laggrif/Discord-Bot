@@ -175,66 +175,120 @@ def AMH_picture(match: Match, lolData: LoLData):
         teams_box[2] = x_text_enemy + size_text_enemy[3]
         teams_box[3] = y_icon_enemy + size
 
+        # ----------------------- Items --------------------------------------------------------------------------------
+
+        # items icons
+        items = match.items()
+        x = 70
+        y = int(champion_box[3] + 30)
+        for i in range(7):
+            draw.rectangle((i * 97 + 70 - 1, y - 1, (i + 1) * 97 + 70 - 1, y + 96),
+                           outline=(200, 200, 200, 255),
+                           fill=(0, 0, 0, 90))
+            if items[i] != '0':
+                lolData.get_item_icon(items[i])
+                paste_image(res + f'images/lol/Items_icons/{lolData.current_ddragon_version}/{items[i]}.png',
+                            (i * 97 + x, y),
+                            (96, 96),
+                            img,
+                            False)
+        items_box = [x, y, x + 7 * 97, y + 97]
+
+        # gold earned
+        font = ImageFont.truetype(FONT, 30)
+        earned = str(match.gold_earned()) + ' Gold earned'
+        gold_earned_size = draw.textbbox((0, 0), earned, font)
+        x = items_box[2] + 50
+        y = items_box[1] + MARGIN
+        draw.text((x, y), earned, fill=(255, 215, 0, 255), font=font)
+        gold_earned_box = draw.textbbox((x, y), earned, font)
+
+        # gold spent
+        font = ImageFont.truetype(FONT, 30)
+        spent = str(match.gold_spent()) + ' Gold spent'
+        x = gold_earned_box[0]
+        y = items_box[3] - gold_earned_size[3] - MARGIN
+        draw.text((x, y), spent, fill=(255, 215, 0, 255), font=font)
+        gold_spent_box = draw.textbbox((x, y), spent, font)
+
+        # ----------------------------- summoner spells ----------------------------------------------------------------
+        # summoner spells
+        sums = match.summoners()
+        m = max(gold_spent_box[2], gold_earned_box[2])
+        x = int((WIDTH - m) / 2 + m - 97)
+        y = items_box[1]
+        for i in range(2):
+            draw.rectangle((x + 97 * i - 1, y - 1, x + 97 * i + 97 - 1, y + 97),
+                           outline=(200, 200, 200, 255),
+                           fill=(0, 0, 0, 90))
+            lolData.get_sum_icon(sums[i])
+            paste_image(res + f'images/lol/Summoner_spells_icons/{lolData.current_ddragon_version}/{sums[i]}.png',
+                        (i * 97 + x, y),
+                        (96, 96),
+                        img,
+                        False)
+        sums_box = [x, y, x + 2 * 97, y + 97]
+
         # ------------------------------ damages dealt -----------------------------------------------------------------
 
         #                           -----static text----
-        # title
-        font = ImageFont.truetype(FONT, 40)
-        text = 'Offensive Statistics'
-        x = 30
-        y = champion_box[3] + 300
-        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
-        title_offense_box = draw.textbbox((x, y), text, font=font)
-
-        # total damages dealt (champ)
-        font = ImageFont.truetype(FONT, 30)
-        damages = 'Damages to champions'
-        x = title_offense_box[0]
-        y = title_offense_box[1] + 80
-        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
-
-        # physic damages dealt
-        font = ImageFont.truetype(FONT, 30)
-        damages = 'Physic damages dealt'
-        y = damages_champ_text_box[1] + STATS_MARGIN
-        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        physic_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
-
-        # magic damages dealt
-        font = ImageFont.truetype(FONT, 30)
-        damages = 'Magic damages dealt'
-        y = physic_damages_champ_text_box[1] + STATS_MARGIN
-        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        magic_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
-
-        # true damages dealt
-        font = ImageFont.truetype(FONT, 30)
-        damages = 'True damages dealt'
-        y = magic_damages_champ_text_box[1] + STATS_MARGIN
-        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        true_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
-
-        # damages to towers
-        font = ImageFont.truetype(FONT, 30)
-        damages = 'Damages to towers'
-        y = true_damages_champ_text_box[1] + STATS_MARGIN
-        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        tower_damages_text_box = draw.textbbox((x, y), damages, font=font)
-
-        # damages to objectives
-        font = ImageFont.truetype(FONT, 30)
-        damages = 'Damages to objectives'
-        y = tower_damages_text_box[1] + STATS_MARGIN
-        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        objectives_damages_text_box = draw.textbbox((x, y), damages, font=font)
 
         # total damages (global)
         font = ImageFont.truetype(FONT, 30)
         damages = 'Total damages dealt'
-        y = objectives_damages_text_box[1] + STATS_MARGIN
+        x = 30
+        y = HEIGHT - 100
         draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
         total_damages_text_box = draw.textbbox((x, y), damages, font=font)
+
+        # damages to objectives
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Damages to objectives'
+        y = total_damages_text_box[1] - STATS_MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        objectives_damages_text_box = draw.textbbox((x, y), damages, font=font)
+
+        # damages to towers
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Damages to towers'
+        y = objectives_damages_text_box[1] - STATS_MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        tower_damages_text_box = draw.textbbox((x, y), damages, font=font)
+
+        # true damages dealt
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'True damages dealt'
+        y = tower_damages_text_box[1] - STATS_MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        true_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
+
+        # magic damages dealt
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Magic damages dealt'
+        y = true_damages_champ_text_box[1] - STATS_MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        magic_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
+
+        # physic damages dealt
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Physic damages dealt'
+        y = magic_damages_champ_text_box[1] - STATS_MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        physic_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
+
+        # total damages dealt (champ)
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Damages to champions'
+        y = physic_damages_champ_text_box[1] - STATS_MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
+
+        # title
+        font = ImageFont.truetype(FONT, 40)
+        text = 'Offensive Statistics'
+        y = damages_champ_text_box[3] - 80
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        title_offense_box = draw.textbbox((x, y), text, font=font)
 
         #                       ------statistics text-----
 
@@ -492,60 +546,31 @@ def AMH_picture(match: Match, lolData: LoLData):
         x = utility_box[2] - draw.textlength(text, font)
         y = time_alive_text_box[1]
         draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
-        time_alie_box = draw.textbbox((x, y), text, font=font)
+        time_alive_box = draw.textbbox((x, y), text, font=font)
 
-        # ----------------------- Items --------------------------------------------------------------------------------
+        # ------------------------------ KDA ---------------------------------------------------------------------------
+        # title
+        font = ImageFont.truetype(FONT, 40)
+        text = 'KDA: '
+        x = 30
+        y = title_offense_box[1] - int((title_offense_box[1] - items_box[3]) / 3)
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        kda_box = draw.textbbox((x, y), text, font=font)
 
-        # items icons
-        items = match.items()
-        x = 70
-        y = int((title_offense_box[1] - time_spent_box[3]) / 2 + time_spent_box[3] - 96 / 2)
-        for i in range(7):
-            draw.rectangle((i * 97 + 70 - 1, y - 1, (i + 1) * 97 + 70 - 1, y + 96),
-                           outline=(200, 200, 200, 255),
-                           fill=(0, 0, 0, 90))
-            if items[i] != '0':
-                lolData.get_item_icon(items[i])
-                paste_image(res + f'images/lol/Items_icons/{lolData.current_ddragon_version}/{items[i]}.png',
-                            (i * 97 + x, y),
-                            (96, 96),
-                            img,
-                            False)
-        items_box = [x, y, x + 7 * 97, y + 97]
+        # k/d/a
+        text = f'{match.kills()}/{match.deaths()}/{match.assists()}'
+        x = kda_box[2] + 10
+        y = kda_box[1]
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        kda_text_box = draw.textbbox((x, y), text, font=font)
 
-        # gold earned
-        font = ImageFont.truetype(FONT, 30)
-        earned = str(match.gold_earned()) + ' Gold earned'
-        gold_earned_size = draw.textbbox((0, 0), earned, font)
-        x = items_box[2] + 50
-        y = items_box[1] + MARGIN
-        draw.text((x, y), earned, fill=(255, 215, 0, 255), font=font)
-        gold_earned_box = draw.textbbox((x, y), earned, font)
-
-        # gold spent
-        font = ImageFont.truetype(FONT, 30)
-        spent = str(match.gold_spent()) + ' Gold spent'
-        x = gold_earned_box[0]
-        y = items_box[3] - gold_earned_size[3] - MARGIN
-        draw.text((x, y), spent, fill=(255, 215, 0, 255), font=font)
-        gold_spent_box = draw.textbbox((x, y), spent, font)
-
-        # ----------------------------- summoner spells ----------------------------------------------------------------
-        # summoner spells
-        sums = match.summoners()
-        m = max(gold_spent_box[2], gold_earned_box[2])
-        x = int((WIDTH - m) / 2 + m - 97)
-        y = items_box[1]
-        for i in range(2):
-            draw.rectangle((x + 97 * i - 1, y - 1, x + 97 * i + 97 - 1, y + 97),
-                           outline=(200, 200, 200, 255),
-                           fill=(0, 0, 0, 90))
-            lolData.get_sum_icon(sums[i])
-            paste_image(res + f'images/lol/Summoner_spells_icons/{lolData.current_ddragon_version}/{sums[i]}.png',
-                        (i * 97 + x, y),
-                        (96, 96),
-                        img,
-                        False)
-        sums_box = [x, y, x + 2 * 97, y + 97]
+        text = '(%.2f)' % match.kda()
+        x = kda_text_box[2] + 10
+        y = kda_box[1]
+        color = (10, 210, 5, 255) if match.kda() >= 1 else (255, 70, 0, 220)
+        draw.text((x, y), text, fill=color, font=font)
+        tb = draw.textbbox((x, y), text, font=font)
+        kda_text_box = [*kda_text_box[0:2], *tb[2:-1]]
+        print(kda_text_box)
 
         return img
