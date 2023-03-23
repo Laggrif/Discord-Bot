@@ -4,7 +4,7 @@ from pathlib import Path
 
 import requests
 
-from src.Discord_Bot_Laggrif.Assets import res_folder
+from Assets import res_folder
 
 res = res_folder() + 'League of Legends/Data'
 

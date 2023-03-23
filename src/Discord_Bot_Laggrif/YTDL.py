@@ -5,7 +5,7 @@ import discord
 import yt_dlp
 from discord import ClientException, AudioSource
 
-from src.Discord_Bot_Laggrif.Assets import res_folder
+from Assets import res_folder
 
 res = res_folder()
 ytdl_format_options = {

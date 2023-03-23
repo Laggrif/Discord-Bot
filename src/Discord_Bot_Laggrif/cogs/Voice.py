@@ -6,8 +6,8 @@ from discord import ApplicationContext, option
 from discord.ext import commands
 from discord.ext.commands import Bot, Cog, slash_command
 
-from src.Discord_Bot_Laggrif.YTDL import *
-from src.Discord_Bot_Laggrif.Assets import *
+from YTDL import *
+from Assets import *
 
 res = res_folder()
 

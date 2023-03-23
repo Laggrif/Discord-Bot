@@ -3,10 +3,10 @@ import sys
 
 from discord.ext import commands
 
-from src.Discord_Bot_Laggrif.MyError import NoError
-from src.Discord_Bot_Laggrif.cogs.Checks import *
-from src.Discord_Bot_Laggrif.cogs.Display import Display
-from src.Discord_Bot_Laggrif.cogs.Voice import *
+from MyError import NoError
+from cogs.Checks import *
+from cogs.Display import Display
+from cogs.Voice import *
 
 # folder to search for res
 res = res_folder()
