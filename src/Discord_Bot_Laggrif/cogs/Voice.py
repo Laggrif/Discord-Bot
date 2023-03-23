@@ -37,8 +37,8 @@ class VoiceClients:
         return self
 
     def add_song_now(self, player, source):
-        self.player_queue.insert(0, player)
-        self.source_queue.insert(0, source)
+        self.player_queue.insert(1, player)
+        self.source_queue.insert(1, source)
         return self
 
     def set_volume(self, volume):
@@ -256,7 +256,6 @@ class Voice(Cog):
                 voice_client.play()
                 await ctx.send(f'Now playing: ***{player.title}***\nFrom {source}')
             l = asyncio.run_coroutine_threadsafe(play(ctx, player), self.bot.loop)
-            print(l.result(0))
 
         if not self.bot.voice_clients:
             ctx = await self.join(ctx, None, message=False)
@@ -332,7 +331,7 @@ class Voice(Cog):
         await ctx.respond('Loop is on' if voice_client.loop else 'Loop is off')
 
     @slash_command()
-    async def next(self, ctx):
+    async def skip(self, ctx):
         await ctx.response.defer()
         voice_client = self.voice_clients[ctx.guild.id]
         change = False

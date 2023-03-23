@@ -233,62 +233,62 @@ def AMH_picture(match: Match, lolData: LoLData):
 
         #                           -----static text----
 
-        # total damages (global)
-        font = ImageFont.truetype(FONT, 30)
-        damages = 'Total damages dealt'
+        # title
+        font = ImageFont.truetype(FONT, 40)
+        text = 'Offensive Statistics'
         x = 30
-        y = HEIGHT - 100
-        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        total_damages_text_box = draw.textbbox((x, y), damages, font=font)
-
-        # damages to objectives
-        font = ImageFont.truetype(FONT, 30)
-        damages = 'Damages to objectives'
-        y = total_damages_text_box[1] - STATS_MARGIN
-        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        objectives_damages_text_box = draw.textbbox((x, y), damages, font=font)
-
-        # damages to towers
-        font = ImageFont.truetype(FONT, 30)
-        damages = 'Damages to towers'
-        y = objectives_damages_text_box[1] - STATS_MARGIN
-        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        tower_damages_text_box = draw.textbbox((x, y), damages, font=font)
-
-        # true damages dealt
-        font = ImageFont.truetype(FONT, 30)
-        damages = 'True damages dealt'
-        y = tower_damages_text_box[1] - STATS_MARGIN
-        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        true_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
-
-        # magic damages dealt
-        font = ImageFont.truetype(FONT, 30)
-        damages = 'Magic damages dealt'
-        y = true_damages_champ_text_box[1] - STATS_MARGIN
-        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        magic_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
-
-        # physic damages dealt
-        font = ImageFont.truetype(FONT, 30)
-        damages = 'Physic damages dealt'
-        y = magic_damages_champ_text_box[1] - STATS_MARGIN
-        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
-        physic_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
+        y = HEIGHT - 400
+        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
+        title_offense_box = draw.textbbox((x, y), text, font=font)
 
         # total damages dealt (champ)
         font = ImageFont.truetype(FONT, 30)
         damages = 'Damages to champions'
-        y = physic_damages_champ_text_box[1] - STATS_MARGIN
+        y = title_offense_box[1] + 80
         draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
         damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
 
-        # title
-        font = ImageFont.truetype(FONT, 40)
-        text = 'Offensive Statistics'
-        y = damages_champ_text_box[3] - 80
-        draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
-        title_offense_box = draw.textbbox((x, y), text, font=font)
+        # physic damages dealt
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Physic damages dealt'
+        y = damages_champ_text_box[1] + STATS_MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        physic_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
+
+        # magic damages dealt
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Magic damages dealt'
+        y = physic_damages_champ_text_box[1] + STATS_MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        magic_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
+
+        # true damages dealt
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'True damages dealt'
+        y = magic_damages_champ_text_box[1] + STATS_MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        true_damages_champ_text_box = draw.textbbox((x, y), damages, font=font)
+
+        # damages to towers
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Damages to towers'
+        y = true_damages_champ_text_box[1] + STATS_MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        tower_damages_text_box = draw.textbbox((x, y), damages, font=font)
+
+        # damages to objectives
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Damages to objectives'
+        y = tower_damages_text_box[1] + STATS_MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        objectives_damages_text_box = draw.textbbox((x, y), damages, font=font)
+
+        # total damages (global)
+        font = ImageFont.truetype(FONT, 30)
+        damages = 'Total damages dealt'
+        y = objectives_damages_text_box[1] + STATS_MARGIN
+        draw.text((x, y), damages, fill=(200, 200, 200, 255), font=font)
+        total_damages_text_box = draw.textbbox((x, y), damages, font=font)
 
         #                       ------statistics text-----
 
@@ -376,7 +376,6 @@ def AMH_picture(match: Match, lolData: LoLData):
         y = physic_damages_taken_text_box[1] + STATS_MARGIN
         draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
         magic_damages_taken_text_box = draw.textbbox((x, y), text, font=font)
-
 
         # true damages taken
         text = 'True damages taken'
