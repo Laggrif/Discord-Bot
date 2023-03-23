@@ -1,10 +1,10 @@
 from PIL import Image, ImageDraw, ImageFont
 
-from Discord_Bot_Laggrif import Assets
-from Discord_Bot_Laggrif.Assets import res_folder
-from Discord_Bot_Laggrif.ColorAverage import *
-from Discord_Bot_Laggrif.LoL.LoLAPI import LoLData
-from Discord_Bot_Laggrif.LoL.LoLChamp import Champ
+from src.Discord_Bot_Laggrif import Assets
+from src.Discord_Bot_Laggrif.Assets import res_folder
+from src.Discord_Bot_Laggrif.ColorAverage import *
+from src.Discord_Bot_Laggrif.LoL.LoLAPI import LoLData
+from src.Discord_Bot_Laggrif.LoL.LoLChamp import Champ
 
 data = res_folder() + 'League of Legends/Data/'
 images = res_folder() + 'images/lol/'

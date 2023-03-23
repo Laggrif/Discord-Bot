@@ -6,13 +6,13 @@ from PIL import ImageDraw
 from PIL import ImageFont
 from discord.ext import tasks
 
-from Discord_Bot_Laggrif.Assets import res_folder
-from Discord_Bot_Laggrif.cogs.Checks import *
+from src.Discord_Bot_Laggrif.Assets import res_folder
+from src.Discord_Bot_Laggrif.cogs.Checks import *
 
 # For OLED display support
 try:
-    from Discord_Bot_Laggrif.Stats import stats
-    from Discord_Bot_Laggrif.Clock import clock
+    from src.Discord_Bot_Laggrif.Stats import stats
+    from src.Discord_Bot_Laggrif.Clock import clock
 
     import board
 except Exception as e:

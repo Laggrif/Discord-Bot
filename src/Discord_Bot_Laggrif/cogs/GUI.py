@@ -1,7 +1,8 @@
 from discord.ui import Button, View
+from discord.ext import commands
 
-from Discord_Bot_Laggrif.Assets import res_folder
-from Discord_Bot_Laggrif.cogs.MyHelp import *
+from src.Discord_Bot_Laggrif.Assets import res_folder
+from src.Discord_Bot_Laggrif.cogs.MyHelp import MyHelp
 
 res = res_folder()
 

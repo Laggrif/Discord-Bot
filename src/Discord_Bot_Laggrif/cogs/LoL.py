@@ -7,10 +7,10 @@ from discord import Interaction, Embed, option
 from discord.ext import commands, tasks
 from discord.ui import Button, View
 
-from Discord_Bot_Laggrif.Assets import res_folder
-from Discord_Bot_Laggrif.LoL import AdvancedHistory, LoLAPI
-from Discord_Bot_Laggrif.LoL.LoLMatch import Match
-from Discord_Bot_Laggrif.cogs.Checks import Checks
+from src.Discord_Bot_Laggrif.Assets import res_folder
+from src.Discord_Bot_Laggrif.cogs.Checks import Checks
+from src.Discord_Bot_Laggrif.LoL import LoLAPI, AdvancedHistory
+from src.Discord_Bot_Laggrif.LoL.LoLMatch import *
 
 res = res_folder() + 'League of Legends/'
 

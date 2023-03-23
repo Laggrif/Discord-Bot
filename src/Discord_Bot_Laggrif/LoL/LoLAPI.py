@@ -4,7 +4,7 @@ from pathlib import Path
 
 import requests
 
-from Discord_Bot_Laggrif.Assets import res_folder
+from src.Discord_Bot_Laggrif.Assets import res_folder
 
 res = res_folder() + 'League of Legends/Data'
 
@@ -113,6 +113,7 @@ class LoLData:
         champ_list_json = requests.get(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json".format(version,
                                                                                       language) + url_token)
+        Path(res + '/champs_lists').mkdir(parents=True, exist_ok=True)
         with open(file_name, 'w') as fb:
             json.dump(champ_list_json.json(), fb, sort_keys=True, indent=4, separators=(',', ': '))
 
@@ -191,6 +192,7 @@ class LoLData:
         item_list_json = requests.get(
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/item.json".format(version,
                                                                                  language) + url_token)
+        Path(res + '/items_lists').mkdir(parents=True, exist_ok=True)
         with open(file_name, 'w') as fb:
             json.dump(item_list_json.json(), fb, sort_keys=True, indent=4, separators=(',', ': '))
 
@@ -220,6 +222,7 @@ class LoLData:
         sums_list_json = requests.get(
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/summoner.json".format(version,
                                                                                      language) + url_token)
+        Path(res + '/sums_lists').mkdir(parents=True, exist_ok=True)
         with open(file_name, 'w') as fb:
             json.dump(sums_list_json.json(), fb, sort_keys=True, indent=4, separators=(',', ': '))
 

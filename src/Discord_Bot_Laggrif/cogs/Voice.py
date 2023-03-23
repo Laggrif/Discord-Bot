@@ -1,11 +1,13 @@
 import json
 import os
+import random
 
 from discord import ApplicationContext, option
 from discord.ext import commands
 from discord.ext.commands import Bot, Cog, slash_command
 
-from Discord_Bot_Laggrif.YTDL import *
+from src.Discord_Bot_Laggrif.YTDL import *
+from src.Discord_Bot_Laggrif.Assets import *
 
 res = res_folder()
 
@@ -196,7 +198,7 @@ class Voice(Cog):
         self.voice_clients[ctx.guild.id].set_volume(vol)
         await ctx.respond(f'Changed volume to {volume}')
 
-    @slash_command(help='farts in the current channel or join the channel you are in')
+    @slash_command(help='farts in the current channel or join the channel you are in to fart')
     async def fart(self, ctx):
         if not self.bot.voice_clients:
             ctx = await self.join(ctx, None, False)

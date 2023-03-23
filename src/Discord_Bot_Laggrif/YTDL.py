@@ -2,15 +2,12 @@ import asyncio
 import audioop
 
 import discord
-import youtube_dl
 import yt_dlp
 from discord import ClientException, AudioSource
 
-from Discord_Bot_Laggrif.Assets import res_folder
+from src.Discord_Bot_Laggrif.Assets import res_folder
 
 res = res_folder()
-
-youtube_dl.utils.bug_reports_message = lambda: ''
 ytdl_format_options = {
     'format': 'bestaudio/best',
     'outtmpl': res + '/downloads/%(title)s.%(ext)s',
