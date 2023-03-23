@@ -19,7 +19,6 @@ classifiers = [
 dependencies = [
     "numpy",
     "py-cord",
-    "youtube_dl",
     "yt-dlp",
     "psutil",
     "PyNaCl",
