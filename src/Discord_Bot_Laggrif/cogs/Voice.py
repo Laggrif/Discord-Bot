@@ -11,7 +11,6 @@ from Assets import *
 
 res = res_folder()
 
-
 class VoiceClients:
     def __init__(self, voice, guild_id):
         self.guild_id = guild_id
