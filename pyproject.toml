@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "discord_bot_laggrif"
+version = "0.0.1"
+authors = [
+    {name = "Laggrif", email = "ugo.novello@gmail.com"},
+]
+description = "A perfect discord bot"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "programming Language :: Python :: 3",
+    "license :: OSI Approved :: MIT License",
+    "operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+    "py-cord",
+    "yt-dlp",
+    "psutil",
+    "PyNaCl",
+    "adafruit-circuitpython-ssd1306",
+    "pillow",
+    "requests"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/Laggrif/Discord-Bot"
+"Bug Tracker" = "https://github.com/Laggrif/Discord-Bot/issues"
+
+[tool.setuptools]
+include-package-data = true

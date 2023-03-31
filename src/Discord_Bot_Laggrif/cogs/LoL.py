@@ -7,12 +7,12 @@ from discord import Interaction, Embed, option
 from discord.ext import commands, tasks
 from discord.ui import Button, View
 
-from Assets import assets
-from LoL import AdvancedHistory, LoLAPI
-from LoL.LoLMatch import Match
+from Assets import res_folder
 from cogs.Checks import Checks
+from LoL import LoLAPI, AdvancedHistory
+from LoL.LoLMatch import *
 
-res = assets() + 'League of Legends/'
+res = res_folder() + 'League of Legends/'
 
 if not os.path.isfile(res + 'Registered_users.json'):
     open(res + 'Registered_users.json', 'w').write('{}')
@@ -131,8 +131,8 @@ class LoL(commands.Cog):
                 # Show champion's icon
                 self.LoLData.get_champ_icon(champ_name)
                 champ_icon = discord.File(
-                    assets() + 'images/lol/Champions_icons/{}/{}.png'.format(self.LoLData.current_ddragon_version,
-                                                                             champ_name),
+                    res_folder() + 'images/lol/Champions_icons/{}/{}.png'.format(self.LoLData.current_ddragon_version,
+                                                                                 champ_name),
                     filename='champ_icon.png')
                 embed.set_thumbnail(url='attachment://champ_icon.png')
 

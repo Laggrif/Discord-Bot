@@ -4,13 +4,13 @@ from pathlib import Path
 
 import requests
 
-from Assets import assets
+from Assets import res_folder
 
-res = assets() + 'League of Legends/Data'
+res = res_folder() + 'League of Legends/Data'
 
 Path(res).mkdir(parents=True, exist_ok=True)
 
-with open(assets() + 'settings/Tokens.json', 'r') as fp:
+with open(res_folder() + 'settings/Tokens.json', 'r') as fp:
     tokens = json.load(fp)
 API_Key = tokens['LoL']
 url_token = "?api_key=" + API_Key
@@ -79,7 +79,7 @@ class LoLData:
 
     @staticmethod
     def reload_api_key():
-        with open(assets() + 'settings/Tokens.json', 'r') as fp:
+        with open(res_folder() + 'settings/Tokens.json', 'r') as fp:
             tokens = json.load(fp)
         global API_Key
         global url_token
@@ -113,6 +113,7 @@ class LoLData:
         champ_list_json = requests.get(
             "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json".format(version,
                                                                                       language) + url_token)
+        Path(res + '/champs_lists').mkdir(parents=True, exist_ok=True)
         with open(file_name, 'w') as fb:
             json.dump(champ_list_json.json(), fb, sort_keys=True, indent=4, separators=(',', ': '))
 
@@ -148,16 +149,16 @@ class LoLData:
 
         version, language = self.check_version_language(version, None)
 
-        if not os.path.isfile(assets() + 'images/lol/Champions_icons/{}/{}.png'.format(version, champion)):
+        if not os.path.isfile(res_folder() + 'images/lol/Champions_icons/{}/{}.png'.format(version, champion)):
             image = requests.get(
                 'https://ddragon.leagueoflegends.com/cdn/{}/img/champion/{}.png'.format(version, champion)).content
-            Path(assets() + 'images/lol/Champions_icons/{}'.format(version)).mkdir(parents=True, exist_ok=True)
-            with open(assets() + 'images/lol/Champions_icons/{}/{}.png'.format(version, champion), 'wb') as fb:
+            Path(res_folder() + 'images/lol/Champions_icons/{}'.format(version)).mkdir(parents=True, exist_ok=True)
+            with open(res_folder() + 'images/lol/Champions_icons/{}/{}.png'.format(version, champion), 'wb') as fb:
                 fb.write(image)
 
     def get_champ_splashart(self, champion, version=None, skin_id=0):
         champion = self.check_champion(champion, version)
-        path = assets() + f'images/lol/Champions_splasharts/{version}/{champion}/'
+        path = res_folder() + f'images/lol/Champions_splasharts/{version}/{champion}/'
 
         if not os.path.isfile(path + f'{skin_id}.png'):
             image = requests.get(f'http://ddragon.leagueoflegends.com/cdn/img/champion/splash/{champion}_{skin_id}.jpg')\
@@ -168,7 +169,7 @@ class LoLData:
 
     def get_champ_loading(self, champion, version=None, skin_id=0):
         champion = self.check_champion(champion, version)
-        path = assets() + f'images/lol/Champions_loading/{version}/{champion}/'
+        path = res_folder() + f'images/lol/Champions_loading/{version}/{champion}/'
 
         if not os.path.isfile(path + f'{skin_id}.png'):
             image = requests.\
@@ -191,6 +192,7 @@ class LoLData:
         item_list_json = requests.get(
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/item.json".format(version,
                                                                                  language) + url_token)
+        Path(res + '/items_lists').mkdir(parents=True, exist_ok=True)
         with open(file_name, 'w') as fb:
             json.dump(item_list_json.json(), fb, sort_keys=True, indent=4, separators=(',', ': '))
 
@@ -205,11 +207,11 @@ class LoLData:
 
         version, language = self.check_version_language(version, None)
 
-        if not os.path.isfile(assets() + 'images/lol/Items_icons/{}/{}.png'.format(version, item_id)):
+        if not os.path.isfile(res_folder() + 'images/lol/Items_icons/{}/{}.png'.format(version, item_id)):
             image = requests.get(
                 'https://ddragon.leagueoflegends.com/cdn/{}/img/item/{}.png'.format(version, item_id)).content
-            Path(assets() + 'images/lol/Items_icons/{}'.format(version)).mkdir(parents=True, exist_ok=True)
-            with open(assets() + 'images/lol/Items_icons/{}/{}.png'.format(version, item_id), 'wb') as fb:
+            Path(res_folder() + 'images/lol/Items_icons/{}'.format(version)).mkdir(parents=True, exist_ok=True)
+            with open(res_folder() + 'images/lol/Items_icons/{}/{}.png'.format(version, item_id), 'wb') as fb:
                 fb.write(image)
 
     def get_sums_list(self, version=None, language=None):
@@ -220,6 +222,7 @@ class LoLData:
         sums_list_json = requests.get(
             "http://ddragon.leagueoflegends.com/cdn/{}/data/{}/summoner.json".format(version,
                                                                                      language) + url_token)
+        Path(res + '/sums_lists').mkdir(parents=True, exist_ok=True)
         with open(file_name, 'w') as fb:
             json.dump(sums_list_json.json(), fb, sort_keys=True, indent=4, separators=(',', ': '))
 
@@ -234,13 +237,13 @@ class LoLData:
 
         version, language = self.check_version_language(version, None)
 
-        if not os.path.isfile(assets() + 'images/lol/Summoner_spells_icons/{}/{}.png'.format(version, sum_id)):
+        if not os.path.isfile(res_folder() + 'images/lol/Summoner_spells_icons/{}/{}.png'.format(version, sum_id)):
             image = requests.get(
                 'https://ddragon.leagueoflegends.com/cdn/{}/img/spell/{}.png'
                 .format(version, self.sums_list[sum_id])) \
                 .content
-            Path(assets() + 'images/lol/Summoner_spells_icons/{}'.format(version)).mkdir(parents=True, exist_ok=True)
-            with open(assets() + 'images/lol/Summoner_spells_icons/{}/{}.png'.format(version, sum_id), 'wb') as fb:
+            Path(res_folder() + 'images/lol/Summoner_spells_icons/{}'.format(version)).mkdir(parents=True, exist_ok=True)
+            with open(res_folder() + 'images/lol/Summoner_spells_icons/{}/{}.png'.format(version, sum_id), 'wb') as fb:
                 fb.write(image)
 
     def get_player_uuid(self, summoner, region=None):

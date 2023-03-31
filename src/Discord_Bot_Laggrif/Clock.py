@@ -1,16 +1,15 @@
 import time
+from datetime import datetime
 
 import adafruit_ssd1306
 import board
-
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 
-from datetime import datetime
-from Assets import assets
+from Assets import res_folder
 
-res = assets()
+res = res_folder()
 
 disp = adafruit_ssd1306.SSD1306_I2C(width=128, height=64, i2c=board.I2C())
 

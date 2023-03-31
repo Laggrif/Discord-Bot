@@ -1,0 +1,5 @@
+recursive-include src/Discord_Bot_Laggrif/res *.mp3
+recursive-include src/Discord_Bot_Laggrif/res *.json
+recursive-include src/Discord_Bot_Laggrif/res *.ttf
+recursive-include src/Discord_Bot_Laggrif/res *.png
+recursive-include src/Discord_Bot_Laggrif/res *.webm

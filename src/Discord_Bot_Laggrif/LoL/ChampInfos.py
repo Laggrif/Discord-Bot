@@ -1,14 +1,14 @@
 from PIL import Image, ImageDraw, ImageFont
 
-import Assets
+from Assets import res_folder
 from ColorAverage import *
 from LoL.LoLAPI import LoLData
 from LoL.LoLChamp import Champ
 
-data = Assets.assets() + 'League of Legends/Data/'
-images = Assets.assets() + 'images/lol/'
+data = res_folder() + 'League of Legends/Data/'
+images = res_folder() + 'images/lol/'
 
-FONT60 = ImageFont.truetype(Assets.assets() + 'fonts/Friz Quadrata Std Medium.otf', 60)
+FONT60 = ImageFont.truetype(res_folder() + 'fonts/Friz Quadrata Std Medium.otf', 60)
 FONT40 = FONT60.font_variant(size=40)
 FONT100 = FONT60.font_variant(size=100)
 
