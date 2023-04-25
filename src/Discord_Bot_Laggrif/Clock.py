@@ -7,7 +7,7 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 
-from Discord_Bot_Laggrif.Assets import res_folder
+from Assets import res_folder
 
 res = res_folder()
 

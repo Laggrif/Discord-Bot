@@ -1,8 +1,8 @@
 from PIL import Image, ImageDraw, ImageFont
 
-from Discord_Bot_Laggrif.Assets import res_folder
-from Discord_Bot_Laggrif.LoL.LoLAPI import LoLData
-from Discord_Bot_Laggrif.LoL.LoLMatch import Match
+from Assets import res_folder
+from LoL.LoLAPI import LoLData
+from LoL.LoLMatch import Match
 
 res = res_folder()
 

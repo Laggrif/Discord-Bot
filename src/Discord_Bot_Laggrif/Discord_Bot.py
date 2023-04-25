@@ -2,11 +2,12 @@
 import sys
 
 from discord.ext import commands
+import discord
 
-from Discord_Bot_Laggrif.MyError import NoError
-from Discord_Bot_Laggrif.cogs.Checks import *
-from Discord_Bot_Laggrif.cogs.Display import Display
-from Discord_Bot_Laggrif.cogs.Voice import *
+from MyError import NoError
+from cogs.Checks import *
+from cogs.Display import Display
+from cogs.Voice import *
 
 # folder to search for res
 res = res_folder()
@@ -116,7 +117,7 @@ def get_bot():
 def run(which):
     dir = os.path.dirname(os.path.realpath(__file__))
     for filename in os.listdir(dir + '/cogs'):
-        bot.load_extension(f'.{filename.removesuffix(".py")}', package='Discord_Bot_Laggrif.cogs')
+        bot.load_extension(f'.{filename.removesuffix(".py")}', package='cogs')
 
     # Search the token for the right bot to launch
     with open(res + 'settings/Tokens.json', 'r') as fp:

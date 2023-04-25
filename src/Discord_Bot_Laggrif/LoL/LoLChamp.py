@@ -1,4 +1,4 @@
-from Discord_Bot_Laggrif.LoL.LoLAPI import LoLData
+from LoL.LoLAPI import LoLData
 
 
 class Champ:

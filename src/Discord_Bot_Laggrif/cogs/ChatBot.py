@@ -9,7 +9,7 @@ from discord.ext import commands, tasks
 from discord.ext.commands import Context
 from discord.ui import Button, View
 
-from Discord_Bot_Laggrif.Assets import res_folder
+from Assets import res_folder
 
 res = res_folder()
 
