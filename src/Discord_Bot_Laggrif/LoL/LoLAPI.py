@@ -178,6 +178,18 @@ class LoLData:
             with open(path + f'{skin_id}.png', 'wb') as fb:
                 fb.write(image)
 
+    def get_champ_passive_icon(self, champion, version=None):
+        champion = self.check_champion(champion, version)
+        path = res_folder() + f'images/lol/Champions_passive/{version}/{champion}/'
+
+        if not os.path.isfile(path + f'passive.png'):
+            passive = self.get_champ_infos(champion, version)['data'][champion]['passive']['image']['full']
+            image = requests.\
+                get(f'http://ddragon.leagueoflegends.com/cdn/{version}/img/passive/{passive}').content
+            Path(path).mkdir(parents=True, exist_ok=True)
+            with open(path + passive, 'wb') as fb:
+                fb.write(image)
+
     def get_all_champs_infos(self, version=None, language=None):
         version, language = self.check_version_language(version, language)
 
