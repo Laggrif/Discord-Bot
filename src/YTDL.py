@@ -1,19 +1,16 @@
 import asyncio
-import random
+import audioop
 
 import discord
-import youtube_dl
-import os
-import sys
-from discord.ext import commands
-from Assets import assets
+import yt_dlp
+from discord import ClientException, AudioSource
 
-assets = assets()
+from Assets import res_folder
 
-youtube_dl.utils.bug_reports_message = lambda: ''
+res = res_folder()
 ytdl_format_options = {
     'format': 'bestaudio/best',
-    'outtmpl': assets + '/downloads/%(title)s.%(ext)s',
+    'outtmpl': res + '/downloads/%(title)s.%(ext)s',
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,
@@ -27,7 +24,7 @@ ytdl_format_options = {
 ffmpeg_options = {
     'options': '-vn'
 }
-ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
+ytdl = yt_dlp.YoutubeDL(ytdl_format_options)
 
 
 class YTDLSource(discord.PCMVolumeTransformer):
@@ -38,7 +35,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         self.title = data.get('title')
         self.url = data.get('url')
-        self.formated_filename = ytdl.prepare_filename(data).replace(assets + '/downloads/', '')
+        self.formated_filename = ytdl.prepare_filename(data).replace(res + '/downloads/', '')
 
     @classmethod
     async def from_url(cls, url, *, loop=None, stream=False):

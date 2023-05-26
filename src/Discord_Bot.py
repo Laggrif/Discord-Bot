@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import sys
 
 from discord.ext import commands
 
@@ -6,9 +7,10 @@ from MyError import NoError
 from cogs.Checks import *
 from cogs.Display import Display
 from cogs.Voice import *
+from Assets import res_folder
 
 # folder to search for res
-res = Assets.assets()
+res = res_folder()
 
 
 # initialise bot
@@ -28,7 +30,7 @@ async def on_ready():
 @bot.event
 async def on_message(msg):
     if 'salut' in msg.content.lower():
-        await msg.add_reaction('a:Salut:915623038140158063')
+        await msg.add_reaction('<a:salut:1039458860395667536>')
     await bot.process_commands(msg)
 
 
@@ -36,7 +38,7 @@ async def on_message(msg):
 async def on_message_edit(before, after):
     if before.content != after.content:
         if 'salut' in after.content.lower():
-            await after.add_reaction('a:Salut:915623038140158063')
+            await after.add_reaction('<a:salut:1039458860395667536>')
         await bot.process_commands(after)
 
 
@@ -92,6 +94,7 @@ async def on_application_command_error(ctx, error):
         return
 
     else:
+        print(error)
         await ctx.send('Something went wrong...')
         raise error
 
@@ -107,16 +110,14 @@ async def on_command_error(ctx, error):
         await on_application_command_error(ctx, error)
 
 
+def get_bot():
+    return bot
+
+
 def run(which):
-    bot.load_extension('cogs.Talking')
-    bot.load_extension('cogs.Voice')
-    bot.load_extension('cogs.MyHelp')
-    bot.load_extension('cogs.Display')
-    bot.load_extension('cogs.Checks')
-    bot.load_extension('cogs.GUI')
-    bot.load_extension('cogs.ChatBot')
-    bot.load_extension('cogs.LoL')
-    bot.load_extension('cogs.API')
+    dir = os.path.dirname(os.path.realpath(__file__))
+    for filename in os.listdir(dir + '/cogs'):
+        bot.load_extension(f'.{filename.removesuffix(".py")}', package='cogs')
 
     # Search the token for the right bot to launch
     with open(res + 'settings/Tokens.json', 'r') as fp:
