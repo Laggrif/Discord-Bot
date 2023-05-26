@@ -10,7 +10,6 @@ from discord.ui import Button, View
 from Assets import res_folder
 from cogs.Checks import Checks
 from LoL import LoLAPI, AdvancedHistory
-from LoL.LoLMatch import *
 
 res = res_folder() + 'League of Legends/'
 

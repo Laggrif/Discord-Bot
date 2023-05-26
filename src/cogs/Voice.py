@@ -7,7 +7,7 @@ from discord.ext import commands
 from discord.ext.commands import Bot, Cog, slash_command
 
 from YTDL import *
-from Assets import *
+from Assets import res_folder
 
 res = res_folder()
 

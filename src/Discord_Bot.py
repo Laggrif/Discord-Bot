@@ -2,12 +2,12 @@
 import sys
 
 from discord.ext import commands
-import discord
 
 from MyError import NoError
 from cogs.Checks import *
 from cogs.Display import Display
 from cogs.Voice import *
+from Assets import res_folder
 
 # folder to search for res
 res = res_folder()
