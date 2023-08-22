@@ -16,7 +16,6 @@ Content should be of the type
 }
 </code></pre>
 To change the default bot, you must edit line 147 of `Discord_Bot.py`.
-Finally, you must replace the path in `Assets.py` for the correct path.
 
 
 ### Install required modules
