@@ -22,7 +22,7 @@ To change the default bot, you must edit line 136 of `Discord_Bot.py`.
 
 Use `sudo pip3 install` or `sudo python3 -m pip install` to install the following modules if you are running a raspberry pi with oled 128x64 display. Otherwise, omit `sudo`:
 * [py-cord](https://docs.pycord.dev/en/stable/)
-* [youtube_dl](https://github.com/ytdl-org/youtube-dl)
+* [yt-dlp](https://github.com/yt-dlp/yt-dlp))
 * [psutil](https://github.com/giampaolo/psutil)
 * [PyNaCl](https://github.com/pyca/pynacl/)
 * [adafruit-circuitpython-ssd1306](https://github.com/adafruit/Adafruit_CircuitPython_SSD1306)
