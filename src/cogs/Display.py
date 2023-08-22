@@ -1,6 +1,6 @@
 import textwrap
 
-import adafruit_ssd1306
+# import adafruit_ssd1306
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont

@@ -563,10 +563,10 @@ def AMH_picture(match: Match, lolData: LoLData):
         draw.text((x, y), text, fill=(200, 200, 200, 255), font=font)
         kda_text_box = draw.textbbox((x, y), text, font=font)
 
-        text = '(%.2f)' % match.kda()
+        text = '(%.2f)' % match.kda() if match.kda() is not None else "(∞)"
         x = kda_text_box[2] + 10
         y = kda_box[1]
-        color = (10, 210, 5, 255) if match.kda() >= 1 else (255, 70, 0, 220)
+        color = (10, 210, 5, 255) if match.kda() is None or match.kda() >= 1 else (255, 70, 0, 220)
         draw.text((x, y), text, fill=color, font=font)
         tb = draw.textbbox((x, y), text, font=font)
         kda_text_box = [*kda_text_box[0:2], *tb[2:-1]]

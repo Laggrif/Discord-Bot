@@ -126,7 +126,7 @@ class Match:
         return self.player_infos['assists']
 
     def kda(self):
-        return (self.kills() + self.assists()) / self.deaths()
+        return (self.kills() + self.assists()) / self.deaths() if self.deaths() != 0 else None
 
     def first_blood_player(self):
         return self.player_infos['firstBloodKill']

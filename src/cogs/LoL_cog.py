@@ -10,6 +10,7 @@ from discord.ui import Button, View
 from Assets import res_folder
 from cogs.Checks import Checks
 from LoL import LoLAPI, AdvancedHistory
+from LoL.LoLMatch import *
 
 res = res_folder() + 'League of Legends/'
 
@@ -124,8 +125,8 @@ class LoL(commands.Cog):
                                 inline=True)
 
                 # Show KDA
-                KDA = match.kda()
-                embed.add_field(name='KDA', value=str(round(KDA, 2)), inline=True)
+                KDA = '%.2f' % match.kda() if match.kda() is not None else "∞"
+                embed.add_field(name='KDA', value=KDA, inline=True)
 
                 # Show champion's icon
                 self.LoLData.get_champ_icon(champ_name)

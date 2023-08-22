@@ -7,7 +7,6 @@ from MyError import NoError
 from cogs.Checks import *
 from cogs.Display import Display
 from cogs.Voice import *
-from Assets import res_folder
 
 # folder to search for res
 res = res_folder()
@@ -60,8 +59,8 @@ async def reload(ctx: discord.ApplicationContext, cog):
         tmp = bot.cogs.copy()
         tmp.pop('Help')
         for ext in tmp.keys():
-            bot.unload_extension(f'cogs.{ext}')
-            bot.load_extension(f'cogs.{ext}')
+            bot.unload_extension(f'.{ext}', package='cogs')
+            bot.load_extension(f'.{ext}', package='cogs')
         await ctx.respond('Reloaded all cogs')
         return
 
@@ -69,7 +68,7 @@ async def reload(ctx: discord.ApplicationContext, cog):
         bot.unload_extension('MyHelp')
         bot.load_extension('MyHelp')
     elif cog in bot.cogs:
-        bot.reload_extension(f'cogs.{cog}')
+        bot.reload_extension(f'.{cog}', package='cogs')
         await ctx.respond(f'Reloaded Cog {cog}')
     else:
         await ctx.respond('Assure cog is valid')

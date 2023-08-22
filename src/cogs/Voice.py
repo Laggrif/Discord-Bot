@@ -7,9 +7,10 @@ from discord.ext import commands
 from discord.ext.commands import Bot, Cog, slash_command
 
 from YTDL import *
-from Assets import res_folder
+from Assets import *
 
 res = res_folder()
+
 
 class VoiceClients:
     def __init__(self, voice, guild_id):
@@ -21,6 +22,9 @@ class VoiceClients:
         self.loop = False
         self.volume = 0.6
 
+        if not os.path.isfile(res + 'settings/Voice.json'):
+            with open(res + 'settings/Voice.json', 'w') as fp:
+                json.dump({}, fp, indent=4, separators=(',', ': '))
         with open(res + 'settings/Voice.json', 'r') as fp:
             settings = json.load(fp)
         if str(guild_id) not in settings.keys():
@@ -215,7 +219,7 @@ class Voice(Cog):
     @slash_command()
     async def info(self, ctx, url, message=True):
         async with ctx.typing():
-            player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
+            player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=False)
             name = player.formated_filename
             available = 'not in the database. Use `download` to add it'
             bool = False
