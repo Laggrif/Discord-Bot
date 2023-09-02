@@ -37,3 +37,6 @@ If you want to use the 128x64 display, you must add `sudo` before.
 
 
 This discord bot was created under Riot Games' "Legal Jibber Jabber" policy using assets owned by Riot Games.  Riot Games does not endorse or sponsor this project.
+
+## Support, feature request and contact
+You can join my [discord server](https://discord.gg/F6bjEfKybV) for any question or post an issue on github.
