@@ -18,10 +18,10 @@ class Champ:
         self.language = self.lolData.default_language if language is None else language
         self.champ = self.lolData.get_champ_infos(champion, version, language)
         if self.champ == 400:
-            del self
-            return
+            raise Exception('Champion not found with specified version and language')
         self.champ_data = self.champ['data'][self.champ_id()]
         self.stats = self.champ_data['stats']
+        self.spells = self.champ_data['spells']
 
     def champ_id(self):
         return list(self.champ['data'].keys())[0]
@@ -112,6 +112,7 @@ class Champ:
         return self.stats['spellblockperlevel']
 
     # -----------abilities------------
+    ## --passive--
     def passive_description(self):
         return self.champ_data['passive']['description']
 
@@ -120,3 +121,56 @@ class Champ:
 
     def passive_name(self):
         return self.champ_data['passive']['name']
+
+    ## --Q--
+    def q_description(self):
+        return self.spells[0]['tooltip']
+
+    def q_image(self):
+        return self.spells[0]['image']['full']
+
+    def q_name(self):
+        return self.spells[0]['name']
+
+    def q_cd(self):
+        return self.spells[0]['cooldownBurn']
+
+    ## --W--
+    def w_description(self):
+        return self.spells[1]['tooltip']
+
+    def w_image(self):
+        return self.spells[1]['image']['full']
+
+    def w_name(self):
+        return self.spells[1]['name']
+
+    def w_cd(self):
+        return self.spells[1]['cooldownBurn']
+
+    ## --E--
+    def e_description(self):
+        return self.spells[2]['tooltip']
+
+    def e_image(self):
+        return self.spells[2]['image']['full']
+
+    def e_name(self):
+        return self.spells[2]['name']
+
+    def e_cd(self):
+        return self.spells[2]['cooldownBurn']
+
+    ## --R--
+    def r_description(self):
+        return self.spells[3]['tooltip']
+
+    def r_image(self):
+        return self.spells[3]['image']['full']
+
+    def r_name(self):
+        return self.spells[3]['name']
+
+    def r_cd(self):
+        return self.spells[3]['cooldownBurn']
+
