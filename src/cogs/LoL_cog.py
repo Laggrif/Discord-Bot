@@ -11,6 +11,8 @@ from Assets import res_folder
 from cogs.Checks import Checks
 from LoL import LoLAPI, AdvancedHistory
 from LoL.LoLMatch import *
+from LoL.LoLChamp import Champ
+from LoL.ChampInfos import ChI_image
 
 res = res_folder() + 'League of Legends/'
 
@@ -18,6 +20,7 @@ if not os.path.isfile(res + 'Registered_users.json'):
     open(res + 'Registered_users.json', 'w').write('{}')
 
 regions = ['euw', 'br', 'eun', 'jp', 'kr', 'la', 'na', 'oc', 'tr', 'ru']
+languages = LoLAPI.LoLData().languages
 
 
 class LimitedList:
@@ -60,7 +63,7 @@ class LoL(commands.Cog):
         await ctx.respond('Reloaded Riot API key')
 
     @commands.slash_command(description='Montre l\'historique des X dernières parties de l\'invocateur donné. (par '
-                                 'défaut 5 parties en normal)')
+                                        'défaut 5 parties)')
     @option('summoner',
             type=str,
             description="Enter a summoner name",
@@ -179,6 +182,80 @@ class LoL(commands.Cog):
             json.dump(registered_users, fb, indent=4, separators=(',', ': '))
         await ctx.respond('Successfully linked discord account **{}** to summoner name **{}**'
                           .format(ctx.author.name + '#' + ctx.author.discriminator, summoner))
+
+    @commands.slash_command(
+        description='Affiche les statistiques détaillées d\'un champion',
+        aliases=['champ', 'champ info', 'champion info', 'champion information'])
+    @option('champion name', type=str, description='Give the name of a champion', required=True)
+    @option('version', type=str, description='Desired version (patch note)', required=False, default=None)
+    @option('language', description='Desired language', required=False, default=None)
+    async def champ_info(self, ctx: discord.ApplicationContext, champion, version=None, language=None):
+        await ctx.defer(invisible=True)
+        wrong_champ = False
+        wrong_lang = False
+        view = None
+        if champion not in self.LoLData.champ_list:
+            wrong_champ = True
+
+            async def champ_list_callback(interaction: Interaction):
+                embed = Embed(title='')
+                champs = ''
+                for i, champ in enumerate(self.LoLData.champ_list):
+                    champs += f'{champ}\n'
+                    if (i + 1) % 10 == 0:
+                        embed.add_field(name='', value=champs, inline=True)
+                        champs = ''
+                if len(champs) != 0:
+                    embed.add_field(name='', value=champs, inline=True)
+                if len(embed.fields) % 3 != 0:
+                    [embed.add_field(name='', value='', inline=True) for _ in range(1 + (len(embed.fields) % 2))]
+                await interaction.message.edit(content=None, embed=embed)
+
+            button = Button(label='Show champions list')
+            button.callback = champ_list_callback
+
+            view = View(button, timeout=None)
+
+        if language not in languages and language is not None:
+            wrong_lang = True
+
+            async def lang_list_callback(interaction: Interaction):
+                embed = Embed(title='')
+                langs = ''
+                for i, lang in enumerate(languages):
+                    langs += f'{lang}\n'
+                    if (i + 1) % 10 == 0:
+                        embed.add_field(name='', value=langs, inline=True)
+                        langs = ''
+                if len(langs) != 0:
+                    embed.add_field(name='', value=langs, inline=True)
+                if len(embed.fields) % 3 != 0:
+                    [embed.add_field(name='', value='', inline=True) for _ in range(1 + (len(embed.fields) % 2))]
+                await interaction.message.edit(content=None, embed=embed)
+
+            button = Button(label='Show languages list')
+            button.callback = lang_list_callback
+
+            if view is not None:
+                view.add_item(button)
+            else:
+                view = View(button, timeout=None)
+
+        if wrong_champ and wrong_lang:
+            await ctx.respond('Language and champion are not valid. Make sure they are valid', view=view)
+        elif wrong_champ:
+            await ctx.respond('Champion is not valid. Make sure it is written correctly', view=view)
+        elif wrong_lang:
+            await ctx.respond('Language is not valid. Make sure it is available', view=view)
+
+        else:
+            async with ctx.typing():
+                img = ChI_image(self.LoLData, Champ(self.LoLData, champion, version, language))
+                with io.BytesIO() as bites:
+                    img.save(bites, format='PNG')
+                    bites.seek(0)
+                    file = discord.File(fp=bites, filename=f'{champion}.png')
+                    await ctx.respond(content=None, file=file)
 
 
 def setup(bot: discord.Bot):
