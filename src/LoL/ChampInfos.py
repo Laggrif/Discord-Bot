@@ -114,8 +114,8 @@ def ChI_image(lolData: LoLData, champ: Champ):
         # -------------------- abilities ---------------------
 
         # passive
-        passive_box = [lore_box[0], lore_box[3] + XXL_MARGIN, lore_box[2], lore_box[3] + XXL_MARGIN + 300]
-
+        passive_box = [lore_box[0], lore_box[3] + XXL_MARGIN, lore_box[2]]
+        """
         txt_box = draw.textbbox((0, 0), '[P]', font=FONT50)
         p_y = passive_box[1] + S_MARGIN
         x = passive_box[0] + S_MARGIN
@@ -141,7 +141,8 @@ def ChI_image(lolData: LoLData, champ: Champ):
 
         draw.rectangle((passive_box[0], passive_box[1], passive_box[2], passive_text_box[3] + S_MARGIN),
                        fill=(bg[0] - 10, bg[1] - 10, bg[2] - 10))
-
+        """
+        draw_ability(draw, 'passive', passive_box, champ, (bg[0] - 10, bg[1] - 10, bg[2] - 10))
         # TODO first compute all positions and boxes, then display elements
 
         # -------------------- skins ---------------------------------
@@ -173,8 +174,9 @@ def ChI_image(lolData: LoLData, champ: Champ):
         return img
 
 
-def draw_ability(draw: ImageDraw, ability: str, box: tuple[int, int, int], champ: Champ):
+def draw_ability(draw: ImageDraw, ability: str, box: tuple[int, int, int], champ: Champ, color: tuple):
     """
+    :param color: color of the background
     :param draw: the canvas to draw on
     :param ability: one of 'passive', 'q', 'w', 'e', 'r'
     :param box: x, y and width
@@ -182,42 +184,35 @@ def draw_ability(draw: ImageDraw, ability: str, box: tuple[int, int, int], champ
     draws the ability on the designed area of the canvas
     """
 
-    letter = ''
     desc = ''
     title = ''
     cd = ''
     stats = ''
+    letter = f'[{ability.upper()}]'
     match ability:
         case 'passive':
             letter = '[P]'
             desc = champ.passive_description()
             title = champ.passive_name()
-            cd = champ.passive_cooldown()
-            stats = champ.passive_stats()
+            cd = ''
         case 'q':
-            letter = f'[{ability.upper()}]'
             desc = champ.q_description()
             title = champ.q_name()
-            cd = champ.q_cooldown()
-            stats = champ.q_stats()
+            cd = champ.q_cd()
         case 'w':
-            letter = f'[{ability.upper()}]'
             desc = champ.w_description()
             title = champ.w_name()
-            cd = champ.w_cooldown()
-            stats = champ.w_stats()
+            cd = champ.w_cd()
         case 'e':
-            letter = f'[{ability.upper()}]'
             desc = champ.e_description()
             title = champ.e_name()
-            cd = champ.e_cooldown()
-            stats = champ.e_stats()
+            cd = champ.e_cd()
         case 'r':
-            letter = f'[{ability.upper()}]'
             desc = champ.r_description()
             title = champ.r_name()
-            cd = champ.r_cooldown()
-            stats = champ.r_stats()
+            cd = champ.r_cd()
+
+    box = (box[0], box[1], box[2], draw.textbbox((0, 0), desc, font=FONT40)[3] + 2 * S_MARGIN)
 
     cd_box = draw.textbbox((0, 0), cd, font=FONT40)
 
@@ -230,3 +225,5 @@ def draw_ability(draw: ImageDraw, ability: str, box: tuple[int, int, int], champ
     x_desc, y_desc = x_img, y_img + SPELL_IMG_SIZE + M_MARGIN
 
     x_cd, y_cd = box[2] - cd_box[2] - S_MARGIN, box[3] - cd_box[3] - S_MARGIN
+
+    draw.rectangle((box[0], box[1], box[2], box[1] + box[3]), fill=color)
