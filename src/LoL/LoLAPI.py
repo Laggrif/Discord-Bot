@@ -109,17 +109,20 @@ class LoLData:
         version, language = self.check_version_language(version, None)
 
         file_name = res + '/champs_lists/champ_list_{}_{}.json'.format(version, language)
-
-        champ_list_json = requests.get(
-            "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json".format(version,
-                                                                                      language) + url_token)
-        Path(res + '/champs_lists').mkdir(parents=True, exist_ok=True)
-        with open(file_name, 'w') as fb:
-            json.dump(champ_list_json.json(), fb, sort_keys=True, indent=4, separators=(',', ': '))
+        if not os.path.isfile(file_name):
+            champ_list_json = requests.get(
+                "https://ddragon.leagueoflegends.com/cdn/{}/data/{}/champion.json".format(version,
+                                                                                          language) + url_token).json()
+            Path(res + '/champs_lists').mkdir(parents=True, exist_ok=True)
+            with open(file_name, 'w') as fb:
+                json.dump(champ_list_json, fb, sort_keys=True, indent=4, separators=(',', ': '))
+        else:
+            with open(file_name, 'r') as fb:
+                champ_list_json = json.load(fb)
 
         tmp_champ_list = {}
-        for champ in champ_list_json.json()['data']:
-            tmp_champ_list[champ] = champ_list_json.json()['data'][champ]['name']
+        for champ in champ_list_json['data']:
+            tmp_champ_list[champ] = champ_list_json['data'][champ]['name']
         return tmp_champ_list
 
     def get_champ_infos(self, champion, version=None, language=None):
@@ -180,7 +183,7 @@ class LoLData:
 
     def get_champ_passive_icon(self, champion, version=None):
         champion = self.check_champion(champion, version)
-        path = res_folder() + f'images/lol/Champions_passive/{version}/{champion}/'
+        path = res_folder() + f'images/lol/Champions_abilities/{version}/{champion}/'
 
         if not os.path.isfile(path + f'passive.png'):
             passive = self.get_champ_infos(champion, version)['data'][champion]['passive']['image']['full']
@@ -188,6 +191,29 @@ class LoLData:
                 get(f'http://ddragon.leagueoflegends.com/cdn/{version}/img/passive/{passive}').content
             Path(path).mkdir(parents=True, exist_ok=True)
             with open(path + passive, 'wb') as fb:
+                fb.write(image)
+
+    def get_champ_ability_icon(self, champion, ability, version=None):
+        champion = self.check_champion(champion, version)
+        path = res_folder() + f'images/lol/Champions_abilities/{version}/{champion}/'
+
+        if not os.path.isfile(path + f'{ability}.png'):
+            match ability.lower():
+                case 'q':
+                    ability = 0
+                case 'w':
+                    ability = 1
+                case 'e':
+                    ability = 2
+                case 'r':
+                    ability = 3
+                case _:
+                    return 400
+            ability = self.get_champ_infos(champion, version)['data'][champion]['spells'][ability]['image']['full']
+            image = requests.\
+                get(f'http://ddragon.leagueoflegends.com/cdn/{version}/img/spell/{ability}').content
+            Path(path).mkdir(parents=True, exist_ok=True)
+            with open(path + ability, 'wb') as fb:
                 fb.write(image)
 
     def get_all_champs_infos(self, version=None, language=None):

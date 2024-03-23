@@ -112,38 +112,32 @@ def ChI_image(lolData: LoLData, champ: Champ):
         draw.text((XXL_MARGIN, stats_start_y), ad, font=FONT40)
 
         # -------------------- abilities ---------------------
+        # fetch icons
+        lolData.get_champ_passive_icon(champion, version)
+        lolData.get_champ_ability_icon(champion, 'q', version)
+        lolData.get_champ_ability_icon(champion, 'w', version)
+        lolData.get_champ_ability_icon(champion, 'e', version)
+        lolData.get_champ_ability_icon(champion, 'r', version)
 
         # passive
-        passive_box = [lore_box[0], lore_box[3] + XXL_MARGIN, lore_box[2]]
-        """
-        txt_box = draw.textbbox((0, 0), '[P]', font=FONT50)
-        p_y = passive_box[1] + S_MARGIN
-        x = passive_box[0] + S_MARGIN
-        draw.text((x, p_y), '[P]', font=FONT50)
+        passive_box = (lore_box[0], lore_box[3] + XXL_MARGIN, lore_box[2])
+        passive_box = draw_ability(draw, 'passive', passive_box, champ, (bg[0] - 10, bg[1] - 10, bg[2] - 10), img)
 
-        x = passive_box[0] + S_MARGIN
-        y = passive_box[3] - SPELL_IMG_SIZE - S_MARGIN
-        paste_image(champ_passive_path,
-                    (x, y),
-                    (SPELL_IMG_SIZE, SPELL_IMG_SIZE),
-                    img,
-                    mask=False)
-        passive_img_box = [x, y, x + SPELL_IMG_SIZE, y + SPELL_IMG_SIZE]
+        # q
+        q_box = (passive_box[0], passive_box[3] + M_MARGIN, passive_box[2])
+        q_box = draw_ability(draw, 'q', q_box, champ, (bg[0] - 10, bg[1] - 10, bg[2] - 10), img)
 
-        draw.text((passive_img_box[2] + S_MARGIN, p_y), champ.passive_name(), font=FONT50)
+        # w
+        w_box = (q_box[0], q_box[3] + M_MARGIN, q_box[2])
+        w_box = draw_ability(draw, 'w', w_box, champ, (bg[0] - 10, bg[1] - 10, bg[2] - 10), img)
 
-        max_width = passive_box[2] - passive_img_box[2] - 2 * M_MARGIN
-        txt = break_text(f_txt(champ.passive_description()), font=FONT40, draw=draw, max_width=max_width)
-        x = passive_img_box[2] + M_MARGIN
-        y = passive_img_box[1]
-        draw.multiline_text((x, y), txt, font=FONT40, spacing=SPACING)
-        passive_text_box = draw.multiline_textbbox((x, y), txt, font=FONT40, spacing=SPACING)
+        # e
+        e_box = (w_box[0], w_box[3] + M_MARGIN, w_box[2])
+        e_box = draw_ability(draw, 'e', e_box, champ, (bg[0] - 10, bg[1] - 10, bg[2] - 10), img)
 
-        draw.rectangle((passive_box[0], passive_box[1], passive_box[2], passive_text_box[3] + S_MARGIN),
-                       fill=(bg[0] - 10, bg[1] - 10, bg[2] - 10))
-        """
-        draw_ability(draw, 'passive', passive_box, champ, (bg[0] - 10, bg[1] - 10, bg[2] - 10))
-        # TODO first compute all positions and boxes, then display elements
+        # r
+        r_box = (e_box[0], e_box[3] + M_MARGIN, e_box[2])
+        draw_ability(draw, 'r', r_box, champ, (bg[0] - 10, bg[1] - 10, bg[2] - 10), img)
 
         # -------------------- skins ---------------------------------
         ratio = 308.0 / 560.0
@@ -174,7 +168,7 @@ def ChI_image(lolData: LoLData, champ: Champ):
         return img
 
 
-def draw_ability(draw: ImageDraw, ability: str, box: tuple[int, int, int], champ: Champ, color: tuple):
+def draw_ability(draw: ImageDraw, ability: str, box: tuple[int, int, int], champ: Champ, color: tuple, img):
     """
     :param color: color of the background
     :param draw: the canvas to draw on
@@ -187,7 +181,6 @@ def draw_ability(draw: ImageDraw, ability: str, box: tuple[int, int, int], champ
     desc = ''
     title = ''
     cd = ''
-    stats = ''
     letter = f'[{ability.upper()}]'
     match ability:
         case 'passive':
@@ -212,18 +205,42 @@ def draw_ability(draw: ImageDraw, ability: str, box: tuple[int, int, int], champ
             title = champ.r_name()
             cd = champ.r_cd()
 
-    box = (box[0], box[1], box[2], draw.textbbox((0, 0), desc, font=FONT40)[3] + 2 * S_MARGIN)
+    desc = break_text(desc, FONT40, draw, box[2] - box[0] - M_MARGIN - 2 * S_MARGIN - SPELL_IMG_SIZE)
 
-    cd_box = draw.textbbox((0, 0), cd, font=FONT40)
+    letter_box = draw.multiline_textbbox((0, 0), letter, font=FONT50)
 
-    x_ability, y_ability = box[0] + S_MARGIN, box[1] + S_MARGIN
+    cd_box = draw.textbbox((0, 0), cd, font=FONT50)
 
-    x_title, y_title = box[0] + SPELL_IMG_SIZE + S_MARGIN, y_ability
+    title_box = draw.multiline_textbbox((0, 0), title, font=FONT50)
 
-    x_img, y_img = x_ability, y_ability + draw.textbbox((0, 0), '[Q]')[3] + M_MARGIN
+    img_box = (0, 0, SPELL_IMG_SIZE, SPELL_IMG_SIZE)
 
-    x_desc, y_desc = x_img, y_img + SPELL_IMG_SIZE + M_MARGIN
+    desc_box = draw.multiline_textbbox((0, 0), desc, font=FONT40, spacing=SPACING)
 
-    x_cd, y_cd = box[2] - cd_box[2] - S_MARGIN, box[3] - cd_box[3] - S_MARGIN
+    x_letter, y_letter = box[0] + S_MARGIN, box[1] + S_MARGIN
 
-    draw.rectangle((box[0], box[1], box[2], box[1] + box[3]), fill=color)
+    x_img, y_img = x_letter, y_letter + M_MARGIN + letter_box[3]
+
+    x_title, y_title = x_img + img_box[2] + M_MARGIN, y_letter
+
+    x_desc, y_desc = x_title, y_title + L_MARGIN + title_box[3]
+
+    x_cd, y_cd = box[2] - cd_box[2] - S_MARGIN, box[1] + S_MARGIN
+
+    box = (box[0], box[1], box[2], max(y_desc + desc_box[3], y_img + img_box[3]) + S_MARGIN)
+
+    draw.rectangle((box[0], box[1], box[2], box[3]), fill=color)
+
+    draw.text((x_letter, y_letter), letter, font=FONT50)
+
+    draw.text((x_title, y_title), title, font=FONT50)
+
+    draw.text((x_cd, y_cd), cd, font=FONT50)
+
+    draw.multiline_text((x_desc, y_desc), desc, font=FONT40, spacing=SPACING)
+
+    ability = champ.spell_image(ability)
+    paste_image(images + f'Champions_abilities/{champ.version}/{champ.champ_id()}/{ability}', (x_img, y_img), (SPELL_IMG_SIZE, SPELL_IMG_SIZE), img, mask=False)
+
+    return box[0], box[1], box[2], box[3]
+

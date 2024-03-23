@@ -126,9 +126,6 @@ class Champ:
     def q_description(self):
         return self.spells[0]['tooltip']
 
-    def q_image(self):
-        return self.spells[0]['image']['full']
-
     def q_name(self):
         return self.spells[0]['name']
 
@@ -138,9 +135,6 @@ class Champ:
     ## --W--
     def w_description(self):
         return self.spells[1]['tooltip']
-
-    def w_image(self):
-        return self.spells[1]['image']['full']
 
     def w_name(self):
         return self.spells[1]['name']
@@ -152,9 +146,6 @@ class Champ:
     def e_description(self):
         return self.spells[2]['tooltip']
 
-    def e_image(self):
-        return self.spells[2]['image']['full']
-
     def e_name(self):
         return self.spells[2]['name']
 
@@ -165,12 +156,22 @@ class Champ:
     def r_description(self):
         return self.spells[3]['tooltip']
 
-    def r_image(self):
-        return self.spells[3]['image']['full']
-
     def r_name(self):
         return self.spells[3]['name']
 
     def r_cd(self):
         return self.spells[3]['cooldownBurn']
+
+    def spell_image(self, spell: str):
+        match spell:
+            case 'passive':
+                return self.passive_image()
+            case 'q':
+                return self.spells[0]['image']['full']
+            case 'w':
+                return self.spells[1]['image']['full']
+            case 'e':
+                return self.spells[2]['image']['full']
+            case 'r':
+                return self.spells[3]['image']['full']
 
