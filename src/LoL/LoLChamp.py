@@ -174,4 +174,7 @@ class Champ:
                 return self.spells[2]['image']['full']
             case 'r':
                 return self.spells[3]['image']['full']
+    # TODO add a spelltoint method to get the spell from an int
+    # TODO combine all spells methods in one
+    # TODO extract data to insert into the description
 
