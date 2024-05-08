@@ -63,7 +63,7 @@ class LoL(commands.Cog):
         await ctx.respond('Reloaded Riot API key')
 
     @commands.slash_command(description='Montre l\'historique des X dernières parties de l\'invocateur donné. (par '
-                                        'défaut 5 parties)')
+                                 'défaut 5 parties en normal)')
     @option('summoner',
             type=str,
             description="Enter a summoner name",

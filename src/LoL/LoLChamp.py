@@ -18,6 +18,7 @@ class Champ:
         self.language = self.lolData.default_language if language is None else language
         self.champ = self.lolData.get_champ_infos(champion, version, language)
         if self.champ == 400:
+            del self
             raise Exception('Champion not found with specified version and language')
         self.champ_data = self.champ['data'][self.champ_id()]
         self.stats = self.champ_data['stats']

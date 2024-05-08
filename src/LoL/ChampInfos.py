@@ -13,6 +13,14 @@ FONT40 = FONT60.font_variant(size=40)
 FONT50 = FONT60.font_variant(size=50)
 FONT100 = FONT60.font_variant(size=100)
 
+img = Image.new('RGB', (1, 1))
+dr = ImageDraw.Draw(img)
+FONT40_HEIGHT = dr.textbbox((0, 0), 'abcdefghijklmnopqrstuvwABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890', font=FONT40)[3]
+FONT50_HEIGHT = dr.textbbox((0, 0), 'abcdefghijklmnopqrstuvwABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890', font=FONT50)[3]
+FONT60_HEIGHT = dr.textbbox((0, 0), 'abcdefghijklmnopqrstuvwABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890', font=FONT60)[3]
+FONT100_HEIGHT = dr.textbbox((0, 0), 'abcdefghijklmnopqrstuvwABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890', font=FONT100)[3]
+img.close()
+
 WIDTH = 2120
 HEIGHT = 3769
 
@@ -106,10 +114,65 @@ def ChI_image(lolData: LoLData, champ: Champ):
         draw.multiline_text((lore_box[0] + S_MARGIN, lore_box[1] + S_MARGIN), txt, font=FONT50, spacing=SPACING)
 
         # -------------------- base stats ---------------------
-        stats_start_y = lore_box[3] + L_MARGIN
-        ad = str(champ.attack_damage())
+        stats_path = images + 'stats_icons/'
+        stats_y = lore_box[3] + L_MARGIN
+        text_x = XXL_MARGIN + FONT40_HEIGHT + S_MARGIN
+        text_x_2 = WIDTH // 2 + FONT40_HEIGHT + S_MARGIN
+        img_x = XXL_MARGIN
 
-        draw.text((XXL_MARGIN, stats_start_y), ad, font=FONT40)
+        ad = str(champ.attack_damage()) + ' (+' + str(champ.attack_damage_growth()) + ')'
+        paste_image(stats_path + 'Attack_damage.webp', (img_x, stats_y), (FONT40_HEIGHT, FONT40_HEIGHT), img, True)
+        draw.text((text_x, stats_y), ad, font=FONT40)
+
+        stats_y += XL_MARGIN
+        atk_speed = str(champ.attack_speed()) + ' (+' + str(champ.attack_speed_growth()) + '%)'
+        paste_image(stats_path + 'Attack_speed.webp', (img_x, stats_y), (FONT40_HEIGHT, FONT40_HEIGHT), img, True)
+        draw.text((text_x, stats_y), atk_speed, font=FONT40)
+
+        stats_y += XL_MARGIN
+        atk_range = str(champ.attack_range())
+        paste_image(stats_path + 'Range.webp', (img_x, stats_y), (FONT40_HEIGHT, FONT40_HEIGHT), img, True)
+        draw.text((text_x, stats_y), atk_range, font=FONT40)
+
+        stats_y += XL_MARGIN
+        mp = str(champ.mp()) + ' (+' + str(champ.mp_growth()) + ')'
+        paste_image(stats_path + 'Mana.webp', (img_x, stats_y), (FONT40_HEIGHT, FONT40_HEIGHT), img, True)
+        draw.text((text_x, stats_y), mp, font=FONT40)
+
+        stats_y += XL_MARGIN
+        mp_regen = str(champ.mp_regen()) + ' (+' + str(champ.mp_regen_growth()) + ')'
+        paste_image(stats_path + 'Mana_regeneration.webp', (img_x, stats_y), (FONT40_HEIGHT, FONT40_HEIGHT), img, True)
+        draw.text((text_x, stats_y), mp_regen, font=FONT40)
+
+        stats_y_tot = stats_y + FONT40_HEIGHT
+
+        stats_y = lore_box[3] + L_MARGIN
+        hp = str(champ.hp()) + ' (+' + str(champ.hp_growth()) + ')'
+        paste_image(stats_path + 'Health.webp', (WIDTH // 2, stats_y), (FONT40_HEIGHT, FONT40_HEIGHT), img, True)
+        draw.text((text_x_2, stats_y), hp, font=FONT40)
+
+        stats_y += XL_MARGIN
+        hp_regen = str(champ.hp_regen()) + ' (+' + str(champ.hp_regen_growth()) + ')'
+        paste_image(stats_path + 'Health_regeneration.webp', (WIDTH // 2, stats_y), (FONT40_HEIGHT, FONT40_HEIGHT), img, True)
+        draw.text((text_x_2, stats_y), hp_regen, font=FONT40)
+
+        stats_y += XL_MARGIN
+        armor = str(champ.armor()) + ' (+' + str(champ.armor_growth()) + ')'
+        paste_image(stats_path + 'Armor.webp', (WIDTH // 2, stats_y), (FONT40_HEIGHT, FONT40_HEIGHT), img, True)
+        draw.text((text_x_2, stats_y), armor, font=FONT40)
+
+        stats_y += XL_MARGIN
+        rm = str(champ.magic_resist()) + ' (+' + str(champ.magic_resist_growth()) + ')'
+        paste_image(stats_path + 'Magic_resistance.webp', (WIDTH // 2, stats_y), (FONT40_HEIGHT, FONT40_HEIGHT), img, True)
+        draw.text((text_x_2, stats_y), rm, font=FONT40)
+
+        stats_y += XL_MARGIN
+        ms = str(champ.move_speed())
+        paste_image(stats_path + 'Movement_speed.webp', (WIDTH // 2, stats_y), (FONT40_HEIGHT, FONT40_HEIGHT), img, True)
+        draw.text((text_x_2, stats_y), ms, font=FONT40)
+
+        stats_y_tot = max(stats_y_tot, stats_y + FONT40_HEIGHT)
+
 
         # -------------------- abilities ---------------------
         # fetch icons
@@ -120,7 +183,7 @@ def ChI_image(lolData: LoLData, champ: Champ):
         lolData.get_champ_ability_icon(champion, 'r', version)
 
         # passive
-        passive_box = (lore_box[0], lore_box[3] + XXL_MARGIN, lore_box[2])
+        passive_box = (lore_box[0], stats_y_tot + L_MARGIN, lore_box[2])
         passive_box = draw_ability(draw, 'passive', passive_box, champ, (bg[0] - 10, bg[1] - 10, bg[2] - 10), img)
 
         # q
