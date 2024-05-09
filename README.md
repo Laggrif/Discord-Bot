@@ -28,6 +28,7 @@ Use `sudo pip3 install` or `sudo python3 -m pip install` to install the followin
 * [adafruit-circuitpython-ssd1306](https://github.com/adafruit/Adafruit_CircuitPython_SSD1306)
 * [pillow](https://python-pillow.org/)
 * [requests](https://requests.readthedocs.io/en/latest/)
+* [opencv-python](https://opencv.org/)
 
 In addition, you must install [ffmpeg](https://ffmpeg.org/) to be able to play music.
 
