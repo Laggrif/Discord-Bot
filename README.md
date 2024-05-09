@@ -29,6 +29,7 @@ Use `sudo pip3 install` or `sudo python3 -m pip install` to install the followin
 * [pillow](https://python-pillow.org/)
 * [requests](https://requests.readthedocs.io/en/latest/)
 * [opencv-python](https://opencv.org/)
+* [scikit-image](https://scikit-image.org/)
 
 In addition, you must install [ffmpeg](https://ffmpeg.org/) to be able to play music.
 
